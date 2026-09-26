@@ -27,17 +27,59 @@ app.get('/api/qr/:id', async (req, res) => {
 
   res.json({ token: token, qr: qrImage, expiraEn: segundosRestantes });
 });
+// API para validar el token que envía el cliente al escanear
+app.get('/api/verify/:id', (req, res) => {
+  const { token } = req.query;
+  const tienda = TIENDAS[req.params.id];
 
+  if (!tienda) {
+    return res.status(404).json({ 
+      valido: false, 
+      mensaje: 'Tienda no registrada en el sistema' 
+    });
+  }
+
+  // Comprobar si el token de 6 dígitos es correcto
+  const esValido = speakeasy.totp.verify({
+    secret: tienda.secreta,
+    encoding: 'base32',
+    token: token,
+    step: 30,
+    window: 1
+  });
+
+  if (esValido) {
+    res.json({
+      valido: true,
+      tienda: tienda.nombre,
+      rif: 'J-123456789',
+      mensaje: 'Comercio Auténtico y Conexión Segura'
+    });
+  } else {
+    res.json({
+      valido: false,
+      tienda: tienda.nombre,
+      mensaje: 'Código expirado o posible captura de pantalla no autorizada'
+    });
+  }
+});
+
+// Ruta /verify
 app.get('/verify', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'verify.html'));
 });
 
+// Ruta /verify/:id (Servir pantalla de cliente si trae token, o pantalla de tienda si no)
 app.get('/verify/:id', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'verify.html'));
+  if (req.query.token) {
+    res.sendFile(path.join(__dirname, 'public', 'client-verify.html'));
+  } else {
+    res.sendFile(path.join(__dirname, 'public', 'verify.html'));
+  }
 });
 
+// Iniciar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor Verifik corriendo en puerto ${PORT}`);
 });
-

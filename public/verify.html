@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verifik Shield - Validación en Vivo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
+
+  <!-- Tarjeta Principal Verifik -->
+  <div class="w-full max-w-sm bg-slate-800 rounded-2xl shadow-2xl p-6 border border-slate-700 text-center">
+    
+    <!-- Encabezado / Logo -->
+    <div class="flex justify-center items-center gap-2 mb-4">
+      <span class="h-3 w-3 rounded-full bg-emerald-500 animate-pulse"></span>
+      <h1 class="text-xs font-bold tracking-widest text-slate-400 uppercase">Verifik Shield</h1>
+    </div>
+
+    <!-- Nombre del Comercio -->
+    <h2 class="text-xl font-extrabold text-white mb-1" id="merchant-name">Tienda Demo Monagas</h2>
+    <p class="text-xs text-slate-400 mb-6">RIF: J-123456789 • Maturín, VE</p>
+
+    <!-- Indicador de Estado (Verde / Valido) -->
+    <div id="status-card" class="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 mb-6">
+      <div class="text-emerald-400 text-3xl font-black mb-1" id="totp-code">849 201</div>
+      <p class="text-xs text-emerald-400 font-semibold uppercase tracking-wider">Comercio Auténtico & Activo</p>
+    </div>
+
+    <!-- Contador Regresivo (30s) -->
+    <div class="mb-4">
+      <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden mb-2">
+        <div id="timer-bar" class="bg-emerald-500 h-full w-full transition-all duration-1000"></div>
+      </div>
+      <p class="text-[10px] text-slate-400">El token expira en <span id="timer-text" class="font-bold text-slate-200">30</span>s</p>
+    </div>
+
+    <!-- Footer de Transparencia -->
+    <div class="text-[10px] text-slate-500 border-t border-slate-700/50 pt-3">
+      Validado mediante cifrado temporal TOTP (RFC 6238).
+    </div>
+  </div>
+
+  <script>
+    // Lógica sencilla de prueba para el contador regresivo
+    let timeLeft = 30;
+    const timerText = document.getElementById('timer-text');
+    const timerBar = document.getElementById('timer-bar');
+
+    setInterval(() => {
+      timeLeft--;
+      if (timeLeft <= 0) timeLeft = 30;
+      
+      timerText.innerText = timeLeft;
+      const percentage = (timeLeft / 30) * 100;
+      timerBar.style.width = percentage + '%';
+    }, 1000);
+  </script>
+</body>
+</html>

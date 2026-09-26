@@ -12,23 +12,24 @@
   <div class="w-full max-w-sm bg-slate-800 rounded-2xl shadow-2xl p-6 border border-slate-700 text-center">
     
     <!-- Encabezado / Logo -->
-    <div class="flex justify-center items-center gap-2 mb-4">
+    <div class="flex justify-center items-center gap-2 mb-3">
       <span class="h-3 w-3 rounded-full bg-emerald-500 animate-pulse"></span>
       <h1 class="text-xs font-bold tracking-widest text-slate-400 uppercase">Verifik Shield</h1>
     </div>
 
-    <!-- Nombre del Comercio -->
+    <!-- Nombre del Comercio y RIF -->
     <h2 class="text-xl font-extrabold text-white mb-1" id="merchant-name">Tienda Oficial Demo</h2>
-    <p class="text-xs text-slate-400 mb-4">Maturín, Monagas • Venezuela</p>
+    <p class="text-xs text-slate-400 mb-4">RIF: J-123456789 • Maturín, Monagas</p>
 
-    <!-- Imagen del Código QR dinámico -->
+    <!-- Código QR Dinámico -->
     <div class="bg-white p-3 rounded-xl shadow-inner mb-4 inline-block">
-      <img id="qr-image" src="" alt="Cargando Código QR..." class="w-48 h-48 mx-auto" />
+      <img id="qr-image" src="" alt="Cargando Código QR..." class="w-44 h-44 mx-auto" />
     </div>
 
-    <!-- Indicador de Estado -->
+    <!-- Indicador de Estado y Clave TOTP de 6 Dígitos -->
     <div id="status-card" class="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3 mb-4">
-      <p class="text-xs text-emerald-400 font-semibold uppercase tracking-wider">Comercio Auténtico & Activo</p>
+      <p class="text-[10px] text-emerald-400 font-semibold uppercase tracking-wider mb-1">Código de Validación Temporal</p>
+      <div class="text-emerald-400 text-2xl font-black tracking-wider" id="totp-code">--- ---</div>
     </div>
 
     <!-- Contador Regresivo -->
@@ -36,7 +37,7 @@
       <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden mb-2">
         <div id="timer-bar" class="bg-emerald-500 h-full w-full transition-all duration-1000"></div>
       </div>
-      <p class="text-[10px] text-slate-400">El código QR expira en <span id="timer-text" class="font-bold text-slate-200">30</span>s</p>
+      <p class="text-[10px] text-slate-400">El token expira en <span id="timer-text" class="font-bold text-slate-200">30</span>s</p>
     </div>
 
     <!-- Footer de Transparencia -->
@@ -51,9 +52,16 @@
         const respuesta = await fetch('/api/qr/demo-tienda');
         const datos = await respuesta.json();
         
-        // Actualizar la imagen QR con la data en Base64 recibida del backend
+        // Actualizar la imagen QR
         document.getElementById('qr-image').src = datos.qr;
         
+        // Extraer el token de la URL del QR para mostrarlo en pantalla
+        const urlParams = new URLSearchParams(datos.qr);
+        // Si tu backend devuelve el código o la URL de validación
+        if (datos.token) {
+          document.getElementById('totp-code').innerText = datos.token;
+        }
+
         let timeLeft = datos.expiraEn;
         const timerText = document.getElementById('timer-text');
         const timerBar = document.getElementById('timer-bar');
@@ -62,7 +70,7 @@
           timeLeft--;
           if (timeLeft <= 0) {
             clearInterval(interval);
-            obtenerQR(); // Volver a pedir el QR cuando venza el tiempo
+            obtenerQR();
           } else {
             timerText.innerText = timeLeft;
             const percentage = (timeLeft / 30) * 100;
@@ -71,11 +79,10 @@
         }, 1000);
 
       } catch (error) {
-        console.error('Error al obtener el QR:', error);
+        console.error('Error al obtener la información:', error);
       }
     }
 
-    // Cargar QR al iniciar
     obtenerQR();
   </script>
 </body>

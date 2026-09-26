@@ -21,7 +21,7 @@ app.get('/api/qr/:id', async (req, res) => {
     step: 30
   });
 
-  const urlValidacion = `http://localhost:3000/verify/${req.params.id}?token=${token}`;
+  const urlValidacion = `https://verifik-core.onrender.com/verify/${req.params.id}?token=${token}`;
   const qrImage = await QRCode.toDataURL(urlValidacion);
   const segundosRestantes = 30 - (Math.floor(Date.now() / 1000) % 30);
 

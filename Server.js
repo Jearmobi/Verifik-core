@@ -25,7 +25,7 @@ app.get('/api/qr/:id', async (req, res) => {
   const qrImage = await QRCode.toDataURL(urlValidacion);
   const segundosRestantes = 30 - (Math.floor(Date.now() / 1000) % 30);
 
-  res.json({ qr: qrImage, expiraEn: segundosRestantes });
+  res.json({ token: token, qr: qrImage, expiraEn: segundosRestantes });
 });
 
 app.get('/verify', (req, res) => {

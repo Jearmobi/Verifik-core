@@ -46,44 +46,70 @@
     </div>
   </div>
 
-  <script>
-    async function obtenerQR() {
-      try {
-        const respuesta = await fetch('/api/qr/demo-tienda');
-        const datos = await respuesta.json();
-        
-        // Actualizar la imagen QR
-        document.getElementById('qr-image').src = datos.qr;
-        
-        // Extraer el token de la URL del QR para mostrarlo en pantalla
-        const urlParams = new URLSearchParams(datos.qr);
-        // Si tu backend devuelve el código o la URL de validación
-        if (datos.token) {
-          document.getElementById('totp-code').innerText = datos.token;
-        }
+<script>
+  let interval;
 
-        let timeLeft = datos.expiraEn;
-        const timerText = document.getElementById('timer-text');
-        const timerBar = document.getElementById('timer-bar');
+  async function obtenerQR() {
+    try {
+      if (interval) clearInterval(interval);
 
-        const interval = setInterval(() => {
-          timeLeft--;
-          if (timeLeft <= 0) {
-            clearInterval(interval);
-            obtenerQR();
-          } else {
-            timerText.innerText = timeLeft;
-            const percentage = (timeLeft / 30) * 100;
-            timerBar.style.width = percentage + '%';
-          }
-        }, 1000);
+      // Extraer el ID de la tienda desde la URL actual
+      const pathParts = window.location.pathname.split('/');
+      const tiendaId = pathParts[pathParts.length - 1] || 'demo-tienda';
 
-      } catch (error) {
-        console.error('Error al obtener la información:', error);
+      const respuesta = await fetch(`/api/qr/${tiendaId}`);
+      
+      if (!respuesta.ok) {
+        document.getElementById('totp-code').innerText = "ERROR";
+        return;
       }
-    }
 
-    obtenerQR();
-  </script>
+      const datos = await respuesta.json();
+      
+      // Actualizar datos del comercio dinámicamente
+      if (datos.tienda) {
+        const titleEl = document.querySelector('h1');
+        if (titleEl) titleEl.innerText = datos.tienda;
+      }
+
+      if (datos.rif) {
+        const rifEl = document.querySelector('p.text-xs');
+        if (rifEl) rifEl.innerText = `RIF: ${datos.rif} • Maturín, Monagas`;
+      }
+      
+      // Asignar imagen del QR y token
+      document.getElementById('qr-image').src = datos.qr;
+
+      if (datos.token) {
+        const tokenFormateado = datos.token.slice(0, 3) + ' ' + datos.token.slice(3);
+        document.getElementById('totp-code').innerText = tokenFormateado;
+      }
+
+      // Temporizador
+      let timeLeft = datos.expiraEn;
+      const timerText = document.getElementById('timer-text');
+      const timerBar = document.getElementById('timer-bar');
+
+      timerText.innerText = timeLeft;
+      timerBar.style.width = ((timeLeft / 30) * 100) + '%';
+
+      interval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          obtenerQR();
+        } else {
+          timerText.innerText = timeLeft;
+          timerBar.style.width = ((timeLeft / 30) * 100) + '%';
+        }
+      }, 1000);
+
+    } catch (error) {
+      console.error('Error al conectar con Verifik API:', error);
+    }
+  }
+
+  obtenerQR();
+</script>
 </body>
 </html>

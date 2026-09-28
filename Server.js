@@ -5,42 +5,50 @@ const path = require('path');
 
 const app = express();
 
-// Middleware para procesar JSON en el cuerpo de las peticiones
 app.use(express.json());
 app.use(express.static('public'));
 
-// Base de datos de comercios en memoria
+// Base de datos de comercios en memoria (Estructura extendida)
 const TIENDAS = {
   'demo-tienda': {
     nombre: 'Tienda Oficial Demo',
     rif: 'J-123456789',
-    secreta: 'KVKX2MTEOB4GHQ3KNURXG33L05CG2T2M'
+    propietario: 'Jesús Moya',
+    telefono: '+58 412-0000000',
+    direccion: 'Centro Comercial Monagas Plaza, Maturín',
+    categoria: 'Comercio General',
+    colorMarca: '#2563eb', // Azul predeterminado
+    secreta: 'KVKX2MTEOB4GHQ3KNURXG33L05CG2T2M',
+    reputacion: { votosPositivos: 12, votosNegativos: 0 } // Base para auditoría comunitaria
   }
 };
 
 // 1. Endpoint para REGISTRAR un nuevo comercio dinámicamente
 app.post('/api/merchants/register', (req, res) => {
-  const { slug, nombre, rif } = req.body;
+  const { slug, nombre, rif, propietario, telefono, direccion, categoria, colorMarca } = req.body;
 
   if (!slug || !nombre || !rif) {
     return res.status(400).json({ error: 'Faltan campos obligatorios: slug, nombre y rif.' });
   }
 
-  // Normalizar el slug (ej: "Farmacia San José" -> "farmacia-san-jose")
   const idNormalizado = slug.toLowerCase().trim().replace(/[^a-z0-9-]/g, '-');
 
   if (TIENDAS[idNormalizado]) {
     return res.status(400).json({ error: 'El identificador de este comercio ya existe.' });
   }
 
-  // Generar una clave secreta única en formato Base32
   const nuevaSecreta = speakeasy.generateSecret({ length: 20 }).base32;
 
-  // Guardar el comercio
   TIENDAS[idNormalizado] = {
     nombre: nombre,
     rif: rif,
-    secreta: nuevaSecreta
+    propietario: propietario || 'No especificado',
+    telefono: telefono || 'No especificado',
+    direccion: direccion || 'Maturín, Monagas',
+    categoria: categoria || 'General',
+    colorMarca: colorMarca || '#2563eb',
+    secreta: nuevaSecreta,
+    reputacion: { votosPositivos: 1, votosNegativos: 0 }
   };
 
   res.json({
@@ -73,6 +81,12 @@ app.get('/api/qr/:id', async (req, res) => {
   res.json({
     tienda: tienda.nombre,
     rif: tienda.rif,
+    propietario: tienda.propietario,
+    telefono: tienda.telefono,
+    direccion: tienda.direccion,
+    categoria: tienda.categoria,
+    colorMarca: tienda.colorMarca,
+    reputacion: tienda.reputacion,
     token: token,
     qr: qrImage,
     expiraEn: segundosRestantes
@@ -104,6 +118,11 @@ app.get('/api/verify/:id', (req, res) => {
       valido: true,
       tienda: tienda.nombre,
       rif: tienda.rif,
+      propietario: tienda.propietario,
+      direccion: tienda.direccion,
+      categoria: tienda.categoria,
+      colorMarca: tienda.colorMarca,
+      reputacion: tienda.reputacion,
       mensaje: 'Comercio Auténtico y Conexión Segura'
     });
   } else {
@@ -124,13 +143,6 @@ app.get('/verify', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'verify.html'));
 });
 
-app.get('/verify/:id', (req, res) => {
-  if (req.query.token) {
-    res.sendFile(path.join(__dirname, 'public', 'client-verify.html'));
-  } else {
-    res.sendFile(path.join(__dirname, 'public', 'verify.html'));
-  }
-});
 app.get('/verify/:id', (req, res) => {
   if (req.query.token) {
     res.sendFile(path.join(__dirname, 'public', 'client-verify.html'));

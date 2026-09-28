@@ -116,10 +116,21 @@ app.get('/api/verify/:id', (req, res) => {
 });
 
 // Rutas de Vistas
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+
 app.get('/verify', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'verify.html'));
 });
 
+app.get('/verify/:id', (req, res) => {
+  if (req.query.token) {
+    res.sendFile(path.join(__dirname, 'public', 'client-verify.html'));
+  } else {
+    res.sendFile(path.join(__dirname, 'public', 'verify.html'));
+  }
+});
 app.get('/verify/:id', (req, res) => {
   if (req.query.token) {
     res.sendFile(path.join(__dirname, 'public', 'client-verify.html'));

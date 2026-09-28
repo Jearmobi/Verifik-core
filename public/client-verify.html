@@ -3,110 +3,120 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verifik Shield - Confirmación de Autenticidad</title>
+  <title>Verikik Shield - Confirmación de Autenticidad</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
+<body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4">
 
-  <div class="w-full max-w-sm bg-slate-800 rounded-2xl shadow-2xl p-6 border border-slate-700 text-center">
+  <div class="bg-slate-800 p-6 rounded-2xl shadow-xl w-full max-w-sm border border-slate-700 text-center">
     
-    <!-- Encabezado -->
-    <div class="flex justify-center items-center gap-2 mb-4">
-      <h1 class="text-xs font-bold tracking-widest text-slate-400 uppercase">Verifik Shield • Auditoría</h1>
+    <div id="status-card" class="p-4 rounded-xl bg-slate-900 border border-slate-700 mb-4">
+      <div id="status-icon" class="text-4xl mb-2">⏳</div>
+      <h2 id="status-title" class="text-lg font-bold">Verificando...</h2>
+      <p id="status-msg" class="text-xs text-slate-400 mt-1">Conectando con el servidor...</p>
     </div>
 
-    <!-- Carga inicial -->
-    <div id="loading" class="py-8">
-      <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-emerald-500 mb-2"></div>
-      <p class="text-sm text-slate-400">Verificando firma digital del comercio...</p>
-    </div>
-
-    <!-- Tarjeta de Resultado -->
-    <div id="result-card" class="hidden">
-      <!-- Icono de Resultado -->
-      <div id="status-icon" class="w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4 text-3xl"></div>
-
-      <h2 id="status-title" class="text-xl font-extrabold mb-1"></h2>
-      <p id="merchant-name" class="text-sm font-semibold text-slate-300"></p>
-      <p id="merchant-rif" class="text-xs text-slate-400 mb-4"></p>
-
-      <div id="status-message-box" class="p-3 rounded-xl border mb-4 text-xs font-medium">
-        <p id="status-message"></p>
+    <!-- Panel de Datos de la Tienda -->
+    <div id="merchant-info" class="hidden text-left bg-slate-900/50 p-4 rounded-xl border border-slate-700/50 mb-4 space-y-2 text-xs">
+      <div>
+        <span class="text-slate-400">Comercio:</span>
+        <p id="merchant-name" class="font-bold text-white text-sm">---</p>
       </div>
+      <div>
+        <span class="text-slate-400">Propietario:</span>
+        <p id="merchant-owner" class="font-semibold text-slate-200">---</p>
+      </div>
+      <div>
+        <span class="text-slate-400">Dirección:</span>
+        <p id="merchant-address" class="font-semibold text-slate-200">---</p>
+      </div>
+    </div>
 
-      <a href="/verify/demo-tienda" class="inline-block w-full py-2.5 bg-slate-700 hover:bg-slate-600 rounded-xl text-xs font-bold transition">
-        Volver a la pantalla principal
-      </a>
+    <!-- Sección de Auditoría Comunitaria -->
+    <div id="vote-section" class="hidden border-t border-slate-700 pt-4 mt-2">
+      <p class="text-xs text-slate-400 mb-3">¿Realizaste un pago o compra en este comercio?</p>
+      <button 
+        id="btn-vote" 
+        onclick="votarComercio()"
+        class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition flex items-center justify-center space-x-2"
+      >
+        <span>👍</span>
+        <span>Confirmar Compra Segura</span>
+      </button>
+      <p id="vote-feedback" class="text-xs text-emerald-400 font-semibold mt-2 hidden"></p>
     </div>
 
   </div>
 
   <script>
-    async function validarEscaneo() {
+    let tiendaIdActual = '';
+
+    async function validarToken() {
+      const pathParts = window.location.pathname.split('/');
+      tiendaIdActual = pathParts[pathParts.length - 1];
+      
       const urlParams = new URLSearchParams(window.location.search);
       const token = urlParams.get('token');
 
-      const loadingEl = document.getElementById('loading');
-      const resultCardEl = document.getElementById('result-card');
-      const statusIconEl = document.getElementById('status-icon');
-      const statusTitleEl = document.getElementById('status-title');
-      const merchantNameEl = document.getElementById('merchant-name');
-      const merchantRifEl = document.getElementById('merchant-rif');
-      const statusMsgBoxEl = document.getElementById('status-message-box');
-      const statusMsgEl = document.getElementById('status-message');
-
-      // ID fijo de prueba si no viene definido
-      const tiendaId = 'demo-tienda';
-
       if (!token) {
-        loadingEl.classList.add('hidden');
-        resultCardEl.classList.remove('hidden');
-        statusIconEl.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4 text-3xl bg-amber-500/20 text-amber-400 border border-amber-500/30";
-        statusIconEl.innerText = "⚠️";
-        statusTitleEl.innerText = "SIN TOKEN";
-        statusTitleEl.className = "text-xl font-extrabold text-amber-400 mb-1";
-        statusMsgEl.innerText = "No se proporcionó un token de validación.";
+        mostrarEstado('❌', 'Token no recibido', 'Escanear el código QR directamente desde la pantalla del comercio.', 'border-red-500/30 bg-red-500/10');
         return;
       }
 
       try {
-        const res = await fetch(`/api/verify/${tiendaId}?token=${token}`);
-        const data = await res.json();
+        const respuesta = await fetch(`/api/verify/${tiendaIdActual}?token=${token}`);
+        const datos = await respuesta.json();
 
-        loadingEl.classList.add('hidden');
-        resultCardEl.classList.remove('hidden');
-
-        if (data.valido) {
-          statusIconEl.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4 text-3xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
-          statusIconEl.innerText = "✓";
-          statusTitleEl.innerText = "¡COMERCIO VERIFICADO!";
-          statusTitleEl.className = "text-xl font-extrabold text-emerald-400 mb-1";
-          merchantNameEl.innerText = data.tienda;
-          merchantRifEl.innerText = `RIF: ${data.rif}`;
-          statusMsgBoxEl.className = "p-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 mb-4 text-xs font-medium text-emerald-300";
-          statusMsgEl.innerText = data.mensaje;
+        if (datos.valido) {
+          mostrarEstado('🛡️', '¡Comercio 100% Auténtico!', datos.mensaje, 'border-emerald-500/30 bg-emerald-500/10');
+          
+          document.getElementById('merchant-info').classList.remove('hidden');
+          document.getElementById('merchant-name').innerText = datos.tienda || 'Comercio Registrado';
+          document.getElementById('merchant-owner').innerText = datos.propietario || 'Propietario Verificado';
+          document.getElementById('merchant-address').innerText = datos.direccion || 'Ubicación Registrada';
+          
+          document.getElementById('vote-section').classList.remove('hidden');
         } else {
-          statusIconEl.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4 text-3xl bg-rose-500/20 text-rose-400 border border-rose-500/30";
-          statusIconEl.innerText = "✕";
-          statusTitleEl.innerText = "CÓDIGO NO VÁLIDO";
-          statusTitleEl.className = "text-xl font-extrabold text-rose-400 mb-1";
-          merchantNameEl.innerText = data.tienda || "Comercio no verificado";
-          statusMsgBoxEl.className = "p-3 rounded-xl border border-rose-500/30 bg-rose-500/10 mb-4 text-xs font-medium text-rose-300";
-          statusMsgEl.innerText = data.mensaje;
+          mostrarEstado('⚠️', 'Verificación Fallida', datos.mensaje, 'border-red-500/30 bg-red-500/10');
         }
-
-      } catch (err) {
-        console.error('Error al verificar:', err);
-        loadingEl.classList.add('hidden');
-        resultCardEl.classList.remove('hidden');
-        statusIconEl.className = "w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4 text-3xl bg-rose-500/20 text-rose-400 border border-rose-500/30";
-        statusIconEl.innerText = "✕";
-        statusTitleEl.innerText = "ERROR DE CONEXIÓN";
-        statusMsgEl.innerText = "No se pudo conectar con el servidor de auditoría.";
+      } catch (e) {
+        mostrarEstado('❌', 'Error de Conexión', 'No se pudo validar el código con el servidor.', 'border-red-500/30 bg-red-500/10');
       }
     }
 
-    validarEscaneo();
+    function mostrarEstado(icono, titulo, msg, clases) {
+      document.getElementById('status-icon').innerText = icono;
+      document.getElementById('status-title').innerText = titulo;
+      document.getElementById('status-msg').innerText = msg;
+      document.getElementById('status-card').className = `p-4 rounded-xl border mb-4 ${clases}`;
+    }
+
+    async function votarComercio() {
+      const btn = document.getElementById('btn-vote');
+      const feedback = document.getElementById('vote-feedback');
+      btn.disabled = true;
+      btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+      try {
+        const respuesta = await fetch(`/api/merchants/${tiendaIdActual}/vote`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const datos = await respuesta.json();
+
+        if (datos.exito) {
+          btn.classList.add('hidden');
+          feedback.innerText = "✓ Voto registrado. ¡Gracias por contribuir a la comunidad!";
+          feedback.classList.remove('hidden');
+        }
+      } catch (e) {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        alert('Error al registrar el voto. Intenta nuevamente.');
+      }
+    }
+
+    validarToken();
   </script>
 </body>
 </html>

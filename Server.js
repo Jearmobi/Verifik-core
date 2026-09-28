@@ -151,6 +151,39 @@ app.get('/verify/:id', (req, res) => {
   }
 });
 
+app.get('/verify/:id', (req, res) => {
+  if (req.query.token) {
+    res.sendFile(path.join(__dirname, 'public', 'client-verify.html'));
+  } else {
+    res.sendFile(path.join(__dirname, 'public', 'verify.html'));
+  }
+});
+
+// Endpoint para registrar votos de la comunidad desde client-verify
+app.post('/api/merchants/:id/vote', (req, res) => {
+  const tienda = TIENDAS[req.params.id];
+  if (!tienda) {
+    return res.status(404).json({ exito: false, mensaje: 'Tienda no encontrada' });
+  }
+
+  if (!tienda.reputacion) {
+    tienda.reputacion = { votosPositivos: 0, votosNegativos: 0 };
+  }
+
+  tienda.reputacion.votosPositivos += 1;
+
+  res.json({
+    exito: true,
+    mensaje: '¡Gracias! Tu confirmación fortalece la seguridad de la comunidad.',
+    reputacion: tienda.reputacion
+  });
+});
+
+// Iniciar servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor Verifik corriendo en puerto ${PORT}`);
+});
 // Iniciar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

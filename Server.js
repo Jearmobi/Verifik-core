@@ -16,7 +16,7 @@ const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // 1. Registro de Comercios
-app.post('/api/register', async (req, res) => {
+app.post(['/api/register', '/api/merchants/register'], async (req, res) => {
   const { id, tienda, rif, colorMarca, categoria, propietario, telefono, direccion } = req.body;
 
   if (!id || !tienda || !rif) {

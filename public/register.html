@@ -74,17 +74,16 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    const { createClient } = window.supabase;
     const SUPABASE_URL = 'https://rwovnzlaqiqrmngitxo.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_9ourf9S4Z-Vvh69bQuHhbQ_KZp0JG1q';
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3b3Z2bnpsYXFpcXJtbmdpdHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MjM1MDMsImV4cCI6MjEwNjE5OTUwM30.XffoL0XBGKnjn3j-TcOKStP0RE-BBNsgaPUgq-B2orU'; 
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     document.getElementById('registerForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const resDiv = document.getElementById('resultado');
       
       if (resDiv) {
-        resDiv.innerText = 'Guardando...';
+        resDiv.innerText = 'Guardando en Supabase...';
         resDiv.className = 'mt-4 p-3 rounded bg-blue-900/50 border border-blue-500 text-blue-200 text-xs block';
       }
 
@@ -100,7 +99,7 @@
       try {
         const { error } = await supabaseClient
           .from('merchants')
-          .upsert({
+          .upsert([{
             id: slug,
             tienda: nombreTienda,
             rif: rifComercio,
@@ -110,17 +109,17 @@
             propietario: data.propietario || 'No especificado',
             telefono: data.telefono || 'No especificado',
             direccion: data.direccion || 'Maturín, Monagas'
-          });
+          }]);
 
         if (error) throw error;
 
         if (resDiv) {
-          resDiv.innerHTML = `<strong>¡Registrado con éxito!</strong><br>ID: ${slug}<br><a href="/verify/${slug}" class="underline text-green-300">Verificar comercio</a>`;
+          resDiv.innerHTML = `<strong>¡Registrado con éxito!</strong><br>ID: ${slug}<br><a href="/verify" class="underline text-green-300">Ir a Verificación</a>`;
           resDiv.className = 'mt-4 p-3 rounded bg-green-900/50 border border-green-500 text-green-200 text-xs block';
         }
       } catch (err) {
         if (resDiv) {
-          resDiv.innerText = 'Error: ' + (err.message || 'No se pudo guardar');
+          resDiv.innerText = 'Error: ' + (err.message || 'No se pudo conectar a la base de datos');
           resDiv.className = 'mt-4 p-3 rounded bg-red-900/50 border border-red-500 text-red-200 text-xs block';
         }
       }

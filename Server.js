@@ -16,7 +16,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Inicializar cliente de Supabase (Limpia espacios y comillas accidentales)
 const supabaseUrl = (process.env.SUPABASE_URL || '').replace(/['"]/g, '').trim();
 const supabaseKey = (process.env.SUPABASE_KEY || '').replace(/['"]/g, '').trim();
-const supabase = createClient(supabaseUrl, supabaseKey);
+
+const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: { persistSession: false }
+});
 
 // --- RUTAS DE NAVEGACIÓN ---
 

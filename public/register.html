@@ -7,76 +7,80 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4">
+
   <div class="max-w-md w-full bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-2xl">
-    <h1 class="text-2xl font-bold text-center text-blue-400 mb-1">Verifik Shield</h1>
-    <p class="text-xs text-slate-400 text-center mb-6">Alta de Comercio & Perfil de Autenticidad</p>
+    <div class="text-center mb-6">
+      <h1 class="text-2xl font-bold text-blue-400">Verifik Shield</h1>
+      <p class="text-xs text-slate-400">Alta de Comercio & Perfil de Autenticidad</p>
+    </div>
 
     <form id="registerForm" class="space-y-4">
       <div>
-        <label class="block text-xs text-slate-400 mb-1">NOMBRE DEL COMERCIO</label>
-        <input type="text" id="tienda" required placeholder="Ej: TIENDITA" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm focus:border-blue-500 outline-none">
+        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Nombre del Comercio</label>
+        <input type="text" name="tienda" id="tienda" required placeholder="Ej. Farmacia La Fe" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-blue-500">
       </div>
 
-      <div class="grid grid-cols-2 gap-2">
+      <div class="grid grid-cols-2 gap-3">
         <div>
-          <label class="block text-xs text-slate-400 mb-1">IDENTIFICADOR (SLUG)</label>
-          <input type="text" id="id" required placeholder="tiendita" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm focus:border-blue-500 outline-none">
+          <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Identificador (Slug)</label>
+          <input type="text" name="id" id="id" placeholder="ej-farmacia-la-fe" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-blue-500">
         </div>
         <div>
-          <label class="block text-xs text-slate-400 mb-1">RIF DEL COMERCIO</label>
-          <input type="text" id="rif" required placeholder="J-31293800-0" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm focus:border-blue-500 outline-none">
+          <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">RIF del Comercio</label>
+          <input type="text" name="rif" id="rif" required placeholder="J-12345678-0" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-blue-500">
         </div>
       </div>
 
-      <hr class="border-slate-700 my-2">
-
-      <div class="grid grid-cols-2 gap-2">
+      <div class="grid grid-cols-2 gap-3">
         <div>
-          <label class="block text-xs text-slate-400 mb-1">PROPIETARIO / RESPONSABLE</label>
-          <input type="text" id="propietario" placeholder="Luisana Hernández" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm focus:border-blue-500 outline-none">
+          <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Propietario / Responsable</label>
+          <input type="text" name="propietario" id="propietario" placeholder="Nombre completo" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-blue-500">
         </div>
         <div>
-          <label class="block text-xs text-slate-400 mb-1">TELÉFONO DE CONTACTO</label>
-          <input type="text" id="telefono" placeholder="+584000000" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm focus:border-blue-500 outline-none">
+          <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Teléfono de Contacto</label>
+          <input type="text" name="telefono" id="telefono" placeholder="+58 412 000 0000" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-blue-500">
         </div>
       </div>
 
       <div>
-        <label class="block text-xs text-slate-400 mb-1">DIRECCIÓN FÍSICA</label>
-        <input type="text" id="direccion" placeholder="CARIPITO" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm focus:border-blue-500 outline-none">
+        <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Dirección Física</label>
+        <input type="text" name="direccion" id="direccion" placeholder="Av. Principal, Maturín, Monagas" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-blue-500">
       </div>
 
-      <div class="grid grid-cols-2 gap-2">
+      <div class="grid grid-cols-2 gap-3">
         <div>
-          <label class="block text-xs text-slate-400 mb-1">CATEGORÍA</label>
-          <select id="categoria" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm focus:border-blue-500 outline-none">
+          <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Categoría</label>
+          <select name="categoria" id="categoria" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-blue-500">
             <option value="Farmacia / Salud">Farmacia / Salud</option>
             <option value="Supermercado">Supermercado</option>
-            <option value="Tecnología">Tecnología</option>
-            <option value="Ropa / Moda">Ropa / Moda</option>
+            <option value="Repuestos">Repuestos</option>
+            <option value="Servicios">Servicios</option>
             <option value="General">General</option>
           </select>
         </div>
         <div>
-          <label class="block text-xs text-slate-400 mb-1">COLOR DE MARCA</label>
-          <input type="color" id="colorMarca" value="#2563eb" class="w-full h-9 bg-slate-900 border border-slate-700 rounded cursor-pointer">
+          <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Color de Marca</label>
+          <input type="color" name="colorMarca" id="colorMarca" value="#2563eb" class="w-full bg-slate-900 border border-slate-700 rounded h-9 p-1 cursor-pointer">
         </div>
       </div>
 
-      <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 font-bold py-2 px-4 rounded text-sm transition mt-4">
+      <button type="submit" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded transition duration-200">
         Registrar Comercio Completo
       </button>
     </form>
 
- <div id="resultado" class="mt-4 hidden p-3 rounded bg-slate-900 border border-slate-700 text-xs"></div>
+    <div id="resultado" class="mt-4 hidden p-3 rounded bg-slate-900 border border-slate-700 text-xs"></div>
+  </div>
 
-  <!-- Cargar librería oficial de Supabase -->
+  <!-- Cargar librería oficial de Supabase via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
     const SUPABASE_URL = 'https://rwovnzlaqiqrmngitxo.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3b3Z2bnpsYXFpcXJtbmdpdHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MjM1MDMsImV4cCI6MjEwNjE5OTUwM30.XffoL0XBGKnjn3j-TcOKStP0RE-BBNsgaPUgq-B2orU'; 
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3b3Z2bnpsYXFpcXJtbmdpdHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MjM1MDMsImV4cCI6MjEwNjE5OTUwM30.XffoL0XBGKnjn3j-TcOKStP0RE-BBNsgaPUgq-B2orU';
+    
+    // Instanciar cliente desde la ventana global del navegador
+    const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     document.getElementById('registerForm').addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -91,13 +95,17 @@
       const data = Object.fromEntries(formData.entries());
 
       const nombreTienda = data.tienda || data.nombreComercio || data.nombre;
-      const slug = data.id || data.slug || (nombreTienda ? nombreTienda.toLowerCase().replace(/[^a-z0-9]/g, '-') : 'tienda-' + Date.now());
+      const slug = (data.id && data.id.trim() !== '') 
+        ? data.id.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-')
+        : (nombreTienda ? nombreTienda.toLowerCase().replace(/[^a-z0-9]/g, '-') : 'tienda-' + Date.now());
+      
       const rifComercio = data.rif || data.rifComercio;
 
+      // Generar clave secreta TOTP simple
       const secret = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
       try {
-        const { error } = await supabaseClient
+        const { error } = await dbClient
           .from('merchants')
           .upsert([{
             id: slug,
@@ -114,12 +122,13 @@
         if (error) throw error;
 
         if (resDiv) {
-          resDiv.innerHTML = `<strong>¡Registrado con éxito!</strong><br>ID: ${slug}<br><a href="/verify" class="underline text-green-300">Ir a Verificación</a>`;
+          resDiv.innerHTML = `<strong>¡Comercio registrado con éxito!</strong><br>ID: ${slug}<br><a href="/verify" class="underline text-green-300 font-bold mt-1 inline-block">Ir a Verificación</a>`;
           resDiv.className = 'mt-4 p-3 rounded bg-green-900/50 border border-green-500 text-green-200 text-xs block';
         }
       } catch (err) {
+        console.error('Error detallado:', err);
         if (resDiv) {
-          resDiv.innerText = 'Error: ' + (err.message || 'No se pudo conectar a la base de datos');
+          resDiv.innerText = 'Error al guardar: ' + (err.message || 'Verifica los permisos RLS en Supabase');
           resDiv.className = 'mt-4 p-3 rounded bg-red-900/50 border border-red-500 text-red-200 text-xs block';
         }
       }

@@ -108,7 +108,7 @@ app.get('/api/merchants/:id', (req, res) => {
   const apiKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3b3Z2bnpsYXFpcXJtbmdpdHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MjM1MDMsImV4cCI6MjEwNjE5OTUwM30.XffoL0XBGKnjn3j-TcOKStP0RE-BBNsgaPUgq-B2orU';
 
   const options = {
-    hostname: 'rwovnzlaqiqrmngitxo.supabase.co',
+    hostname: 'rwovvnzlaqiqrmngitxo.supabase.co',
     port: 443,
     path: `/rest/v1/merchants?id=eq.${encodeURIComponent(merchantId)}&select=*`,
     method: 'GET',

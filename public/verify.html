@@ -5,14 +5,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Verifik Shield - Perfil de Verificación</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Librería CDN de Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4">
 
   <div class="max-w-md w-full bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-2xl relative overflow-hidden">
     
-    <!-- Banner superior con el nombre del sistema -->
+    <!-- Banner superior -->
     <div class="text-center mb-6">
       <h1 class="text-xl font-bold text-blue-400 flex items-center justify-center gap-2">
         <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -23,7 +21,7 @@
       <p class="text-xs text-slate-400">Verificación de Autenticidad Comercial</p>
     </div>
 
-    <!-- Buscador rápido por ID / Slug -->
+    <!-- Buscador -->
     <div class="mb-6">
       <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Buscar Comercio Registrado</label>
       <div class="flex gap-2">
@@ -34,12 +32,12 @@
       </div>
     </div>
 
-    <!-- Estado de Carga -->
+    <!-- Carga -->
     <div id="loading" class="hidden text-center py-6 text-sm text-slate-400">
       Cargando información del comercio...
     </div>
 
-    <!-- Tarjeta del Perfil Digital del Comercio -->
+    <!-- Tarjeta del Perfil -->
     <div id="merchantCard" class="hidden space-y-4 border-t border-slate-700 pt-4">
       
       <!-- Sello de Verificado -->
@@ -51,7 +49,7 @@
         <span id="categoriaBadge" class="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full"></span>
       </div>
 
-      <!-- Datos Principales de la Tienda -->
+      <!-- Datos Principales -->
       <div>
         <h2 id="tiendaNombre" class="text-xl font-bold text-white"></h2>
         <p id="tiendaRif" class="text-xs text-slate-400 font-mono"></p>
@@ -72,7 +70,7 @@
         </div>
       </div>
 
-      <!-- Botón para Compartir Enlace Digital -->
+      <!-- Compartir -->
       <div class="pt-2">
         <button id="shareBtn" class="w-full bg-slate-700 hover:bg-slate-600 text-xs font-bold py-2 px-4 rounded flex items-center justify-center gap-2 transition">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,7 +83,7 @@
 
     </div>
 
-    <!-- Error / No encontrado -->
+    <!-- No encontrado -->
     <div id="notFoundCard" class="hidden text-center py-6 border-t border-slate-700 mt-4">
       <p class="text-sm text-red-400 font-semibold">No se encontró ningún comercio con ese identificador.</p>
       <p class="text-xs text-slate-400 mt-1">Verifica el nombre o asegúrate de que el comercio esté registrado.</p>
@@ -94,17 +92,12 @@
   </div>
 
   <script>
-    const SUPABASE_URL = 'https://rwovnzlaqiqrmngitxo.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3b3Z2bnpsYXFpcXJtbmdpdHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MjM1MDMsImV4cCI6MjEwNjE5OTUwM30.XffoL0XBGKnjn3j-TcOKStP0RE-BBNsgaPUgq-B2orU';
-    const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
     const searchInput = document.getElementById('searchInput');
     const searchBtn = document.getElementById('searchBtn');
     const loading = document.getElementById('loading');
     const merchantCard = document.getElementById('merchantCard');
     const notFoundCard = document.getElementById('notFoundCard');
 
-    // Función para buscar comercio en Supabase
     async function fetchMerchant(id) {
       if (!id) return;
       
@@ -113,20 +106,18 @@
       notFoundCard.classList.add('hidden');
 
       try {
-        const { data, error } = await dbClient
-          .from('merchants')
-          .select('*')
-          .eq('id', id.toLowerCase().trim())
-          .single();
+        const res = await fetch(`/api/merchants/${encodeURIComponent(id)}`);
+        const result = await res.json();
 
         loading.classList.add('hidden');
 
-        if (error || !data) {
+        if (!res.ok || !result.exito) {
           notFoundCard.classList.remove('hidden');
           return;
         }
 
-        // Renderizar datos
+        const data = result.comercio;
+
         document.getElementById('tiendaNombre').innerText = data.tienda || 'Comercio Registrado';
         document.getElementById('tiendaRif').innerText = 'RIF: ' + (data.rif || 'N/A');
         document.getElementById('categoriaBadge').innerText = data.categoria || 'General';
@@ -141,17 +132,14 @@
       }
     }
 
-    // Buscar al hacer clic en el botón
     searchBtn.addEventListener('click', () => {
       fetchMerchant(searchInput.value);
     });
 
-    // Permitir buscar presionado Enter
     searchInput.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') fetchMerchant(searchInput.value);
     });
 
-    // Detectar si viene un ID en la URL (Ejemplo: /verify?id=tiendita)
     const urlParams = new URLSearchParams(window.location.search);
     const idFromUrl = urlParams.get('id');
     if (idFromUrl) {
@@ -159,7 +147,6 @@
       fetchMerchant(idFromUrl);
     }
 
-    // Copiar enlace de la tienda
     document.getElementById('shareBtn').addEventListener('click', () => {
       const currentId = searchInput.value || idFromUrl;
       const shareUrl = `${window.location.origin}/verify?id=${currentId}`;

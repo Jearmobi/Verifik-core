@@ -101,6 +101,46 @@ app.post(['/api/register', '/api/merchants/register'], (req, res) => {
     res.status(500).json({ exito: false, mensaje: err.message });
   }
 });
+// Endpoint para consultar un comercio por su ID
+app.get('/api/merchants/:id', (req, res) => {
+  const merchantId = req.params.id.toLowerCase().trim();
+
+  const apiKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3b3Z2bnpsYXFpcXJtbmdpdHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MjM1MDMsImV4cCI6MjEwNjE5OTUwM30.XffoL0XBGKnjn3j-TcOKStP0RE-BBNsgaPUgq-B2orU';
+
+  const options = {
+    hostname: 'rwovnzlaqiqrmngitxo.supabase.co',
+    port: 443,
+    path: `/rest/v1/merchants?id=eq.${encodeURIComponent(merchantId)}&select=*`,
+    method: 'GET',
+    headers: {
+      'apikey': apiKey,
+      'Authorization': `Bearer ${apiKey}`
+    }
+  };
+
+  const request = https.request(options, (response) => {
+    let data = '';
+    response.on('data', (chunk) => { data += chunk; });
+    response.on('end', () => {
+      try {
+        const result = JSON.parse(data);
+        if (Array.isArray(result) && result.length > 0) {
+          return res.json({ exito: true, comercio: result[0] });
+        } else {
+          return res.status(404).json({ exito: false, mensaje: 'Comercio no encontrado' });
+        }
+      } catch (err) {
+        return res.status(500).json({ exito: false, mensaje: 'Error parsing JSON' });
+      }
+    });
+  });
+
+  request.on('error', (err) => {
+    res.status(500).json({ exito: false, mensaje: err.message });
+  });
+
+  request.end();
+});
 
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {

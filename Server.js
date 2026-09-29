@@ -17,8 +17,8 @@ app.get('/register', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'register.html'));
 });
 
-// Servir la vista de verificación (compatible con móviles y parámetros de URL)
-app.get(['/verify', '/verify*'], (req, res) => {
+// Servir la vista de verificación (compatible con rutas secundarias y parámetros móviles)
+app.get(/^\/verify/, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'verify.html'));
 });
 

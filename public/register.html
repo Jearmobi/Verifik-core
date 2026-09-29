@@ -68,46 +68,61 @@
       </button>
     </form>
 
-    <div id="resultado" class="mt-4 hidden p-3 rounded bg-slate-900 border border-slate-700 text-xs"></div>
-  </div>
+ <div id="resultado" class="mt-4 hidden p-3 rounded bg-slate-900 border border-slate-700 text-xs"></div>
+
+  <!-- Cargar librería oficial de Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
+    const { createClient } = window.supabase;
+    const SUPABASE_URL = 'https://rwovnzlaqiqrmngitxo.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_9ourf9S4Z-Vvh69bQuHhbQ_KZp0JG1q';
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+
     document.getElementById('registerForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const resDiv = document.getElementById('resultado');
-      resDiv.classList.remove('hidden');
-      resDiv.innerText = 'Guardando...';
+      
+      if (resDiv) {
+        resDiv.innerText = 'Guardando...';
+        resDiv.className = 'mt-4 p-3 rounded bg-blue-900/50 border border-blue-500 text-blue-200 text-xs block';
+      }
 
-      const payload = {
-        id: document.getElementById('id').value.trim(),
-        tienda: document.getElementById('tienda').value.trim(),
-        rif: document.getElementById('rif').value.trim(),
-        propietario: document.getElementById('propietario').value.trim(),
-        telefono: document.getElementById('telefono').value.trim(),
-        direccion: document.getElementById('direccion').value.trim(),
-        categoria: document.getElementById('categoria').value,
-        colorMarca: document.getElementById('colorMarca').value
-      };
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+
+      const nombreTienda = data.tienda || data.nombreComercio || data.nombre;
+      const slug = data.id || data.slug || (nombreTienda ? nombreTienda.toLowerCase().replace(/[^a-z0-9]/g, '-') : 'tienda-' + Date.now());
+      const rifComercio = data.rif || data.rifComercio;
+
+      const secret = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 
       try {
-        const response = await fetch('/api/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+        const { error } = await supabaseClient
+          .from('merchants')
+          .upsert({
+            id: slug,
+            tienda: nombreTienda,
+            rif: rifComercio,
+            secret: secret,
+            color_marca: data.colorMarca || '#2563eb',
+            categoria: data.categoria || 'General',
+            propietario: data.propietario || 'No especificado',
+            telefono: data.telefono || 'No especificado',
+            direccion: data.direccion || 'Maturín, Monagas'
+          });
 
-        const data = await response.json();
+        if (error) throw error;
 
-        if (data.exito) {
-          resDiv.className = 'mt-4 p-3 rounded bg-green-900/50 border border-green-500 text-green-200 text-xs';
-          resDiv.innerHTML = `<strong>¡Registrado con éxito!</strong><br>ID: ${data.tiendaId}<br><a href="/verify/${data.tiendaId}" class="underline text-blue-300" target="_blank">Ir a pantalla de verificación ➔</a>`;
-        } else {
-          resDiv.className = 'mt-4 p-3 rounded bg-red-900/50 border border-red-500 text-red-200 text-xs';
-          resDiv.innerText = 'Error: ' + data.mensaje;
+        if (resDiv) {
+          resDiv.innerHTML = `<strong>¡Registrado con éxito!</strong><br>ID: ${slug}<br><a href="/verify/${slug}" class="underline text-green-300">Verificar comercio</a>`;
+          resDiv.className = 'mt-4 p-3 rounded bg-green-900/50 border border-green-500 text-green-200 text-xs block';
         }
       } catch (err) {
-        resDiv.className = 'mt-4 p-3 rounded bg-red-900/50 border border-red-500 text-red-200 text-xs';
-        resDiv.innerText = 'Error de conexión con el servidor.';
+        if (resDiv) {
+          resDiv.innerText = 'Error: ' + (err.message || 'No se pudo guardar');
+          resDiv.className = 'mt-4 p-3 rounded bg-red-900/50 border border-red-500 text-red-200 text-xs block';
+        }
       }
     });
   </script>

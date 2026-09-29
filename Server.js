@@ -16,23 +16,18 @@ const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // 1. Registro de Comercios
-// 1. Registro de Comercios (Mapeo flexible de campos)
 app.post(['/api/register', '/api/merchants/register'], async (req, res) => {
-  const body = req.body;
-  
-  const id = body.id || body.slug || body.identificador;
-  const tienda = body.tienda || body.nombre || body.nombreComercio;
-  const rif = body.rif || body.rifComercio;
-  const colorMarca = body.colorMarca || body.color || '#2563eb';
-  const categoria = body.categoria || 'General';
-  const propietario = body.propietario || body.responsable || 'No especificado';
-  const telefono = body.telefono || 'No especificado';
-  const direccion = body.direccion || 'Maturín, Monagas';
+  const { id, tienda, rif, colorMarca, categoria, propietario, telefono, direccion } = req.body;
 
-  if (!id || !tienda || !rif) {
+  // Extraer valores permitiendo nombres alternativos del formulario
+  const finalId = id || req.body.slug || req.body.identificador;
+  const finalTienda = tienda || req.body.nombre || req.body.nombreComercio;
+  const finalRif = rif || req.body.rifComercio;
+
+  if (!finalId || !finalTienda || !finalRif) {
     return res.status(400).json({ 
       exito: false, 
-      mensaje: 'Faltan campos obligatorios: Identificador (slug), Nombre de la tienda o RIF' 
+      mensaje: 'El Identificador (Slug), Nombre y RIF son obligatorios' 
     });
   }
 
@@ -42,32 +37,26 @@ app.post(['/api/register', '/api/merchants/register'], async (req, res) => {
   const { data, error } = await supabase
     .from('merchants')
     .upsert({
-      id,
-      tienda,
-      rif,
-      secret,
-      color_marca: colorMarca,
-      categoria,
-      propietario,
-      telefono,
-      direccion
+      id: finalId,
+      tienda: finalTienda,
+      rif: finalRif,
+      secret: secret,
+      color_marca: colorMarca || '#2563eb',
+      categoria: categoria || 'General',
+      propietario: propietario || 'No especificado',
+      telefono: telefono || 'No especificado',
+      direccion: direccion || 'Maturín, Monagas'
     });
 
   if (error) {
-    console.error('Error al guardar en Supabase:', error);
-    return res.status(500).json({ exito: false, mensaje: 'Error al registrar en la base de datos' });
+    console.error('Error Supabase:', error);
+    return res.status(500).json({ exito: false, mensaje: 'Error al guardar en Supabase' });
   }
 
   res.json({
     exito: true,
     mensaje: 'Comercio registrado con éxito',
-    tiendaId: id
-  });
-});
-  res.json({
-    exito: true,
-    mensaje: 'Comercio registrado con éxito en Supabase',
-    tiendaId: id
+    tiendaId: finalId
   });
 });
 
@@ -94,7 +83,6 @@ app.get('/api/qr/:id', async (req, res) => {
   const verifyUrl = `${req.protocol}://${req.get('host')}/verify/${tiendaId}?token=${token}`;
   const qrImage = await QRCode.toDataURL(verifyUrl);
 
-  // Obtener conteo de votos positivos
   const { count } = await supabase
     .from('votes')
     .select('*', { count: 'exact', head: true })
@@ -115,7 +103,7 @@ app.get('/api/qr/:id', async (req, res) => {
   });
 });
 
-// 3. Validar Token en cliente
+// 3. Validar Token
 app.get('/api/verify/:id', async (req, res) => {
   const tiendaId = req.params.id;
   const { token } = req.query;
@@ -148,7 +136,7 @@ app.get('/api/verify/:id', async (req, res) => {
   } else {
     res.json({
       valido: false,
-      mensaje: 'El código expiró o no pertenece a este comercio. Solicita el QR actualizado al vendedor.'
+      mensaje: 'El código expiró o no pertenece a este comercio.'
     });
   }
 });
@@ -171,7 +159,7 @@ app.post('/api/merchants/:id/vote', async (req, res) => {
   });
 });
 
-// Rutas de Vistas HTML
+// Rutas de Vistas
 app.get('/register', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'register.html'));
 });

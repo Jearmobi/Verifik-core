@@ -16,11 +16,24 @@ const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 // 1. Registro de Comercios
+// 1. Registro de Comercios (Mapeo flexible de campos)
 app.post(['/api/register', '/api/merchants/register'], async (req, res) => {
-  const { id, tienda, rif, colorMarca, categoria, propietario, telefono, direccion } = req.body;
+  const body = req.body;
+  
+  const id = body.id || body.slug || body.identificador;
+  const tienda = body.tienda || body.nombre || body.nombreComercio;
+  const rif = body.rif || body.rifComercio;
+  const colorMarca = body.colorMarca || body.color || '#2563eb';
+  const categoria = body.categoria || 'General';
+  const propietario = body.propietario || body.responsable || 'No especificado';
+  const telefono = body.telefono || 'No especificado';
+  const direccion = body.direccion || 'Maturín, Monagas';
 
   if (!id || !tienda || !rif) {
-    return res.status(400).json({ exito: false, mensaje: 'ID, tienda y RIF son obligatorios' });
+    return res.status(400).json({ 
+      exito: false, 
+      mensaje: 'Faltan campos obligatorios: Identificador (slug), Nombre de la tienda o RIF' 
+    });
   }
 
   // Generar secreto TOTP
@@ -33,18 +46,24 @@ app.post(['/api/register', '/api/merchants/register'], async (req, res) => {
       tienda,
       rif,
       secret,
-      color_marca: colorMarca || '#2563eb',
-      categoria: categoria || 'General',
-      propietario: propietario || 'No especificado',
-      telefono: telefono || 'No especificado',
-      direccion: direccion || 'Maturín, Monagas'
+      color_marca: colorMarca,
+      categoria,
+      propietario,
+      telefono,
+      direccion
     });
 
   if (error) {
     console.error('Error al guardar en Supabase:', error);
-    return res.status(500).json({ exito: false, mensaje: 'Error al registrar el comercio' });
+    return res.status(500).json({ exito: false, mensaje: 'Error al registrar en la base de datos' });
   }
 
+  res.json({
+    exito: true,
+    mensaje: 'Comercio registrado con éxito',
+    tiendaId: id
+  });
+});
   res.json({
     exito: true,
     mensaje: 'Comercio registrado con éxito en Supabase',

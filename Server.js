@@ -1,140 +1,158 @@
+require('dotenv').config();
 const express = require('express');
 const speakeasy = require('speakeasy');
 const QRCode = require('qrcode');
 const path = require('path');
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
-
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Base de datos de comercios en memoria (Estructura extendida)
-const TIENDAS = {
-  'demo-tienda': {
-    nombre: 'Tienda Oficial Demo',
-    rif: 'J-123456789',
-    propietario: 'Jesús Moya',
-    telefono: '+58 412-0000000',
-    direccion: 'Centro Comercial Monagas Plaza, Maturín',
-    categoria: 'Comercio General',
-    colorMarca: '#2563eb', // Azul predeterminado
-    secreta: 'KVKX2MTEOB4GHQ3KNURXG33L05CG2T2M',
-    reputacion: { votosPositivos: 12, votosNegativos: 0 } // Base para auditoría comunitaria
-  }
-};
+// Inicializar cliente de Supabase
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-// 1. Endpoint para REGISTRAR un nuevo comercio dinámicamente
-app.post('/api/merchants/register', (req, res) => {
-  const { slug, nombre, rif, propietario, telefono, direccion, categoria, colorMarca } = req.body;
+// 1. Registro de Comercios
+app.post('/api/register', async (req, res) => {
+  const { id, tienda, rif, colorMarca, categoria, propietario, telefono, direccion } = req.body;
 
-  if (!slug || !nombre || !rif) {
-    return res.status(400).json({ error: 'Faltan campos obligatorios: slug, nombre y rif.' });
+  if (!id || !tienda || !rif) {
+    return res.status(400).json({ exito: false, mensaje: 'ID, tienda y RIF son obligatorios' });
   }
 
-  const idNormalizado = slug.toLowerCase().trim().replace(/[^a-z0-9-]/g, '-');
+  // Generar secreto TOTP
+  const secret = speakeasy.generateSecret({ length: 20 }).base32;
 
-  if (TIENDAS[idNormalizado]) {
-    return res.status(400).json({ error: 'El identificador de este comercio ya existe.' });
+  const { data, error } = await supabase
+    .from('merchants')
+    .upsert({
+      id,
+      tienda,
+      rif,
+      secret,
+      color_marca: colorMarca || '#2563eb',
+      categoria: categoria || 'General',
+      propietario: propietario || 'No especificado',
+      telefono: telefono || 'No especificado',
+      direccion: direccion || 'Maturín, Monagas'
+    });
+
+  if (error) {
+    console.error('Error al guardar en Supabase:', error);
+    return res.status(500).json({ exito: false, mensaje: 'Error al registrar el comercio' });
   }
-
-  const nuevaSecreta = speakeasy.generateSecret({ length: 20 }).base32;
-
-  TIENDAS[idNormalizado] = {
-    nombre: nombre,
-    rif: rif,
-    propietario: propietario || 'No especificado',
-    telefono: telefono || 'No especificado',
-    direccion: direccion || 'Maturín, Monagas',
-    categoria: categoria || 'General',
-    colorMarca: colorMarca || '#2563eb',
-    secreta: nuevaSecreta,
-    reputacion: { votosPositivos: 1, votosNegativos: 0 }
-  };
 
   res.json({
     exito: true,
-    mensaje: 'Comercio registrado exitosamente',
-    comercio: {
-      id: idNormalizado,
-      nombre: nombre,
-      rif: rif,
-      urlPantalla: `https://verifik-core.onrender.com/verify/${idNormalizado}`
-    }
+    mensaje: 'Comercio registrado con éxito en Supabase',
+    tiendaId: id
   });
 });
 
-// 2. Endpoint que genera los datos del QR y Token dinámicamente
+// 2. Obtener QR y Token
 app.get('/api/qr/:id', async (req, res) => {
-  const tienda = TIENDAS[req.params.id];
-  if (!tienda) return res.status(404).json({ error: 'Tienda no registrada' });
+  const tiendaId = req.params.id;
+
+  const { data: tienda, error } = await supabase
+    .from('merchants')
+    .select('*')
+    .eq('id', tiendaId)
+    .single();
+
+  if (error || !tienda) {
+    return res.status(404).json({ error: 'Tienda no encontrada' });
+  }
 
   const token = speakeasy.totp({
-    secret: tienda.secreta,
-    encoding: 'base32',
-    step: 30
+    secret: tienda.secret,
+    encoding: 'base32'
   });
 
-  const urlValidacion = `https://verifik-core.onrender.com/verify/${req.params.id}?token=${token}`;
-  const qrImage = await QRCode.toDataURL(urlValidacion);
-  const segundosRestantes = 30 - (Math.floor(Date.now() / 1000) % 30);
+  const remainingSeconds = 30 - (Math.floor(Date.now() / 1000) % 30);
+  const verifyUrl = `${req.protocol}://${req.get('host')}/verify/${tiendaId}?token=${token}`;
+  const qrImage = await QRCode.toDataURL(verifyUrl);
+
+  // Obtener conteo de votos positivos
+  const { count } = await supabase
+    .from('votes')
+    .select('*', { count: 'exact', head: true })
+    .eq('merchant_id', tiendaId);
 
   res.json({
-    tienda: tienda.nombre,
+    tienda: tienda.tienda,
     rif: tienda.rif,
+    colorMarca: tienda.color_marca,
+    categoria: tienda.categoria,
     propietario: tienda.propietario,
     telefono: tienda.telefono,
     direccion: tienda.direccion,
-    categoria: tienda.categoria,
-    colorMarca: tienda.colorMarca,
-    reputacion: tienda.reputacion,
-    token: token,
+    reputacion: { votosPositivos: count || 0 },
     qr: qrImage,
-    expiraEn: segundosRestantes
+    token: token,
+    expiraEn: remainingSeconds
   });
 });
 
-// 3. API para validar el token que envía el cliente
-app.get('/api/verify/:id', (req, res) => {
+// 3. Validar Token en cliente
+app.get('/api/verify/:id', async (req, res) => {
+  const tiendaId = req.params.id;
   const { token } = req.query;
-  const tienda = TIENDAS[req.params.id];
 
-  if (!tienda) {
-    return res.status(404).json({ 
-      valido: false, 
-      mensaje: 'Tienda no registrada en el sistema' 
-    });
+  const { data: tienda, error } = await supabase
+    .from('merchants')
+    .select('*')
+    .eq('id', tiendaId)
+    .single();
+
+  if (error || !tienda) {
+    return res.status(404).json({ valido: false, mensaje: 'Comercio no encontrado' });
   }
 
-  const esValido = speakeasy.totp.verify({
-    secret: tienda.secreta,
+  const valido = speakeasy.totp.verify({
+    secret: tienda.secret,
     encoding: 'base32',
     token: token,
-    step: 30,
     window: 1
   });
 
-  if (esValido) {
+  if (valido) {
     res.json({
       valido: true,
-      tienda: tienda.nombre,
-      rif: tienda.rif,
+      mensaje: 'Código verificado. Este comercio está activo y es auténtico.',
+      tienda: tienda.tienda,
       propietario: tienda.propietario,
-      direccion: tienda.direccion,
-      categoria: tienda.categoria,
-      colorMarca: tienda.colorMarca,
-      reputacion: tienda.reputacion,
-      mensaje: 'Comercio Auténtico y Conexión Segura'
+      direccion: tienda.direccion
     });
   } else {
     res.json({
       valido: false,
-      tienda: tienda.nombre,
-      mensaje: 'Código expirado o posible captura de pantalla no autorizada'
+      mensaje: 'El código expiró o no pertenece a este comercio. Solicita el QR actualizado al vendedor.'
     });
   }
 });
 
-// Rutas de Vistas
+// 4. Registrar Votos
+app.post('/api/merchants/:id/vote', async (req, res) => {
+  const tiendaId = req.params.id;
+
+  const { error } = await supabase
+    .from('votes')
+    .insert([{ merchant_id: tiendaId, voto_tipo: 'positivo' }]);
+
+  if (error) {
+    return res.status(500).json({ exito: false, mensaje: 'Error al registrar el voto' });
+  }
+
+  res.json({
+    exito: true,
+    mensaje: '¡Gracias! Tu confirmación fortalece la seguridad de la comunidad.'
+  });
+});
+
+// Rutas de Vistas HTML
 app.get('/register', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'register.html'));
 });
@@ -151,39 +169,6 @@ app.get('/verify/:id', (req, res) => {
   }
 });
 
-app.get('/verify/:id', (req, res) => {
-  if (req.query.token) {
-    res.sendFile(path.join(__dirname, 'public', 'client-verify.html'));
-  } else {
-    res.sendFile(path.join(__dirname, 'public', 'verify.html'));
-  }
-});
-
-// Endpoint para registrar votos de la comunidad desde client-verify
-app.post('/api/merchants/:id/vote', (req, res) => {
-  const tienda = TIENDAS[req.params.id];
-  if (!tienda) {
-    return res.status(404).json({ exito: false, mensaje: 'Tienda no encontrada' });
-  }
-
-  if (!tienda.reputacion) {
-    tienda.reputacion = { votosPositivos: 0, votosNegativos: 0 };
-  }
-
-  tienda.reputacion.votosPositivos += 1;
-
-  res.json({
-    exito: true,
-    mensaje: '¡Gracias! Tu confirmación fortalece la seguridad de la comunidad.',
-    reputacion: tienda.reputacion
-  });
-});
-
-// Iniciar servidor
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Servidor Verifik corriendo en puerto ${PORT}`);
-});
 // Iniciar servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

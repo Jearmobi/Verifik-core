@@ -18,7 +18,7 @@ app.get('/register', (req, res) => {
 });
 
 // Servir la vista de verificación (compatible con móviles y parámetros de URL)
-app.get(['/verify', '/verify/*'], (req, res) => {
+app.get(['/verify', '/verify*'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'verify.html'));
 });
 

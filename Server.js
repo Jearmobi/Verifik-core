@@ -1,22 +1,41 @@
 const express = require('express');
+const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 const speakeasy = require('speakeasy');
 require('dotenv').config();
 
 const app = express();
+
+// Middleware para procesar JSON y datos de formulario
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
+
+// Servir archivos estáticos desde la carpeta 'public'
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Inicializar cliente de Supabase (Limpia espacios y comillas accidentales)
+const supabaseUrl = (process.env.SUPABASE_URL || '').replace(/['"]/g, '').trim();
+const supabaseKey = (process.env.SUPABASE_KEY || '').replace(/['"]/g, '').trim();
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+// --- RUTAS DE NAVEGACIÓN ---
 
 // Redirigir raíz al registro
 app.get('/', (req, res) => {
   res.redirect('/register');
 });
 
-// Inicializar cliente de Supabase (Limpia espacios y comillas accidentales)
-const supabaseUrl = (process.env.SUPABASE_URL || '').replace(/['"]/g, '').trim();
-const supabaseKey = (process.env.SUPABASE_KEY || '').replace(/['"]/g, '').trim();
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Servir la página de Registro HTML
+app.get('/register', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'register.html'));
+});
+
+// Servir la página de Verificación HTML
+app.get('/verify', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'verify.html'));
+});
+
+// --- API ENDPOINTS ---
 
 // 1. Registro de Comercios
 app.post(['/api/register', '/api/merchants/register'], async (req, res) => {

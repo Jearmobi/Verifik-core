@@ -10,11 +10,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 
-// Inicializar cliente de Supabase
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+// Inicializar cliente de Supabase (Limpia espacios y comillas accidentales)
+const supabaseUrl = (process.env.SUPABASE_URL || '').replace(/['"]/g, '').trim();
+const supabaseKey = (process.env.SUPABASE_KEY || '').replace(/['"]/g, '').trim();
 const supabase = createClient(supabaseUrl, supabaseKey);
-
 // 1. Registro de Comercios
 app.post(['/api/register', '/api/merchants/register'], async (req, res) => {
   const { id, tienda, rif, colorMarca, categoria, propietario, telefono, direccion } = req.body;

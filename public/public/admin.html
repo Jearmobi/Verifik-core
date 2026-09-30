@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verifik Shield - Panel de Administración</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen p-4 font-sans">
+
+  <div class="max-w-5xl mx-auto space-y-6">
+    
+    <!-- Header Admin -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900 border border-slate-800 p-5 rounded-2xl">
+      <div>
+        <div class="inline-flex items-center gap-2 bg-blue-950/60 border border-blue-500/30 px-3 py-1 rounded-full mb-1">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-xs font-bold tracking-wider text-blue-300 uppercase">Panel de Control</span>
+        </div>
+        <h1 class="text-xl font-bold text-white">Auditoría & Gestión Verifik Shield</h1>
+      </div>
+      <button id="refreshBtn" class="bg-blue-600 active:bg-blue-700 text-xs font-bold px-4 py-2 rounded-xl text-white transition">
+        Actualizar Datos
+      </button>
+    </div>
+
+    <!-- Pestañas de Navegación Interna -->
+    <div class="flex border-b border-slate-800 text-xs font-bold gap-4">
+      <button id="tabMerchants" class="pb-2 border-b-2 border-blue-500 text-blue-400">Comercios Registrados</button>
+      <button id="tabReports" class="pb-2 text-slate-400 hover:text-slate-200">Denuncias y Reportes</button>
+    </div>
+
+    <!-- Sección 1: Tabla de Comercios -->
+    <div id="sectionMerchants" class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead class="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase font-mono">
+            <tr>
+              <th class="p-3">Comercio / ID</th>
+              <th class="p-3">RIF & Propietario</th>
+              <th class="p-3">Pago Móvil</th>
+              <th class="p-3">Nivel de Seguridad</th>
+              <th class="p-3 text-right">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="merchantsTableBody" class="divide-y divide-slate-800 text-slate-300">
+            <tr><td colspan="5" class="p-4 text-center text-slate-500">Cargando comercios...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Sección 2: Tabla de Reportes / Denuncias -->
+    <div id="sectionReports" class="hidden bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead class="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase font-mono">
+            <tr>
+              <th class="p-3">ID Comercio</th>
+              <th class="p-3">Motivo del Reporte</th>
+              <th class="p-3">Contacto Denunciante</th>
+              <th class="p-3">Fecha</th>
+            </tr>
+          </thead>
+          <tbody id="reportsTableBody" class="divide-y divide-slate-800 text-slate-300">
+            <tr><td colspan="4" class="p-4 text-center text-slate-500">Cargando reportes...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const SUPABASE_HOST = 'rwovvnzlaqiqrmngitxo.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3b3Z2bnpsYXFpcXJtbmdpdHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MjM1MDMsImV4cCI6MjEwNjE5OTUwM30.XffoL0XBGKnjn3j-TcOKStP0RE-BBNsgaPUgq-B2orU';
+
+    const headers = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
+
+    // Cargar Comercios
+    async function loadMerchants() {
+      const tbody = document.getElementById('merchantsTableBody');
+      try {
+        const res = await fetch(`https://${SUPABASE_HOST}/rest/v1/merchants?select=*&order=created_at.desc`, { headers });
+        const merchants = await res.json();
+
+        if (!merchants.length) {
+          tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">No hay comercios registrados aún.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = merchants.map(m => `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="p-3">
+              <div class="font-bold text-white">${m.tienda || 'Sin Nombre'}</div>
+              <div class="font-mono text-[10px] text-blue-400">/verify?id=${m.id}</div>
+            </td>
+            <td class="p-3">
+              <div>${m.rif || 'N/A'}</div>
+              <div class="text-[10px] text-slate-400">${m.propietario || 'S/D'}</div>
+            </td>
+            <td class="p-3 font-mono text-[11px]">
+              ${m.banco_pago_movil ? `${m.banco_pago_movil} -${m.cedula_pago_movil}` : '<span class="text-slate-500">No registrado</span>'}
+            </td>
+            <td class="p-3">
+              <select onchange="updateLevel('${m.id}', this.value)" class="bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-white">
+                <option value="1" ${m.nivel_verificacion == 1 ? 'selected' : ''}>1★ Básica</option>
+                <option value="2" ${m.nivel_verificacion == 2 ? 'selected' : ''}>2★ Comercial</option>
+                <option value="3" ${m.nivel_verificacion == 3 ? 'selected' : ''}>3★ Certificada</option>
+              </select>
+            </td>
+            <td class="p-3 text-right">
+              <a href="/verify?id=${m.id}" target="_blank" class="text-blue-400 hover:underline text-[11px]">Ver Certificado</a>
+            </td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-rose-400">Error al cargar datos.</td></tr>';
+      }
+    }
+
+    // Actualizar Nivel de Verificación en Supabase
+    async function updateLevel(id, newLevel) {
+      try {
+        const res = await fetch(`https://${SUPABASE_HOST}/rest/v1/merchants?id=eq.${encodeURIComponent(id)}`, {
+          method: 'PATCH',
+          headers: { ...headers, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ nivel_verificacion: parseInt(newLevel) })
+        });
+        if (res.ok) alert(`Nivel de verificación actualizado a ${newLevel}★ para ${id}`);
+        else alert("Error al actualizar nivel.");
+      } catch (e) { alert("Error de conexión."); }
+    }
+
+    // Cargar Denuncias
+    async function loadReports() {
+      const tbody = document.getElementById('reportsTableBody');
+      try {
+        const res = await fetch(`https://${SUPABASE_HOST}/rest/v1/reports?select=*&order=fecha.desc`, { headers });
+        const reports = await res.json();
+
+        if (!reports.length) {
+          tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-500">Sin denuncias o reportes registrados.</td></tr>';
+          return;
+        }
+
+        tbody.innerHTML = reports.map(r => `
+          <tr class="hover:bg-slate-800/40 transition">
+            <td class="p-3 font-mono text-rose-400 font-bold">${r.merchant_id}</td>
+            <td class="p-3 text-slate-200">${r.motivo}</td>
+            <td class="p-3 font-mono">${r.contacto_denunciante || 'Anónimo'}</td>
+            <td class="p-3 text-slate-400 text-[10px]">${new Date(r.fecha).toLocaleString()}</td>
+          </tr>
+        `).join('');
+      } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-rose-400">Error al cargar reportes.</td></tr>';
+      }
+    }
+
+    // Gestión de Pestañas
+    const tabMerchants = document.getElementById('tabMerchants');
+    const tabReports = document.getElementById('tabReports');
+    const secMerchants = document.getElementById('sectionMerchants');
+    const secReports = document.getElementById('sectionReports');
+
+    tabMerchants.addEventListener('click', () => {
+      tabMerchants.className = "pb-2 border-b-2 border-blue-500 text-blue-400";
+      tabReports.className = "pb-2 text-slate-400 hover:text-slate-200";
+      secMerchants.classList.remove('hidden');
+      secReports.classList.add('hidden');
+    });
+
+    tabReports.addEventListener('click', () => {
+      tabReports.className = "pb-2 border-b-2 border-blue-500 text-blue-400";
+      tabMerchants.className = "pb-2 text-slate-400 hover:text-slate-200";
+      secReports.classList.remove('hidden');
+      secMerchants.classList.add('hidden');
+      loadReports();
+    });
+
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+      loadMerchants();
+      loadReports();
+    });
+
+    window.addEventListener('DOMContentLoaded', loadMerchants);
+  </script>
+</body>
+</html>

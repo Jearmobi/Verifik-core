@@ -24,7 +24,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => res.redirect('/register'));
 app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
 app.get(/^\/verify/, (req, res) => res.sendFile(path.join(__dirname, 'public', 'verify.html')));
-
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+});
 // 1. ENDPOINT: Registro de Comercio con Nivel de Seguridad
 app.post(['/api/register', '/api/merchants/register'], (req, res) => {
   try {

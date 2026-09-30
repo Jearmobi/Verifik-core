@@ -3,98 +3,110 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Verifik Shield - Perfil de Verificación</title>
+  <title>Verifik Shield - Certificado Digital de Seguridad</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-3 font-sans">
 
-  <div class="max-w-md w-full bg-slate-800 p-6 rounded-xl border border-slate-700 shadow-2xl relative overflow-hidden">
+  <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl space-y-5 relative">
     
-    <!-- Banner superior -->
-    <div class="text-center mb-6">
-      <h1 class="text-xl font-bold text-blue-400 flex items-center justify-center gap-2">
-        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <!-- Encabezado -->
+    <div class="text-center border-b border-slate-800 pb-3">
+      <div class="inline-flex items-center gap-2 bg-blue-950/60 border border-blue-500/30 px-3 py-1 rounded-full mb-1">
+        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
         </svg>
-        Verifik Shield
-      </h1>
-      <p class="text-xs text-slate-400">Verificación de Autenticidad Comercial</p>
-    </div>
-
-    <!-- Buscador adaptado a teclados móviles -->
-    <div class="mb-6">
-      <label class="block text-xs font-semibold text-slate-300 uppercase mb-1">Buscar Comercio Registrado</label>
-      <div class="flex gap-2">
-        <input 
-          type="text" 
-          id="searchInput" 
-          placeholder="Ej: tiendita" 
-          autocorrect="off" 
-          autocapitalize="none" 
-          spellcheck="false"
-          class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-sm text-white focus:outline-none focus:border-blue-500"
-        >
-        <button id="searchBtn" type="button" class="bg-blue-600 active:bg-blue-700 hover:bg-blue-500 px-4 py-2 rounded text-sm font-semibold transition touch-manipulation">
-          Buscar
-        </button>
+        <span class="text-xs font-bold tracking-wider text-blue-300 uppercase">Verifik Shield</span>
       </div>
+      <p class="text-[11px] text-slate-400">Verificación Oficial de Identidad Comercial</p>
     </div>
 
-    <!-- Carga -->
-    <div id="loading" class="hidden text-center py-6 text-sm text-slate-400">
-      Cargando información del comercio...
+    <!-- Buscador Móvil -->
+    <div class="flex gap-2">
+      <input 
+        type="text" 
+        id="searchInput" 
+        placeholder="Ej: farmacia-central" 
+        autocorrect="off" 
+        autocapitalize="none" 
+        spellcheck="false"
+        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500 transition"
+      >
+      <button id="searchBtn" type="button" class="bg-blue-600 active:bg-blue-700 text-xs font-bold px-4 py-2 rounded-xl text-white transition touch-manipulation">
+        Buscar
+      </button>
     </div>
 
-    <!-- Tarjeta del Perfil -->
-    <div id="merchantCard" class="hidden space-y-4 border-t border-slate-700 pt-4">
+    <!-- Indicador Carga -->
+    <div id="loading" class="hidden text-center py-6 text-xs text-slate-400 animate-pulse">
+      Validando credenciales comerciales...
+    </div>
+
+    <!-- Ficha de Verificación -->
+    <div id="merchantCard" class="hidden space-y-4">
       
-      <!-- Sello de Verificado -->
-      <div class="flex items-center justify-between bg-green-900/30 border border-green-500/50 p-3 rounded-lg">
-        <div class="flex items-center gap-2">
-          <span class="inline-block w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
-          <span class="text-xs font-bold text-green-300 uppercase tracking-wide">Comercio Verificado</span>
-        </div>
-        <span id="categoriaBadge" class="text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full"></span>
-      </div>
-
-      <!-- Datos Principales -->
-      <div>
-        <h2 id="tiendaNombre" class="text-xl font-bold text-white"></h2>
-        <p id="tiendaRif" class="text-xs text-slate-400 font-mono"></p>
-      </div>
-
-      <div class="grid grid-cols-2 gap-3 text-xs bg-slate-900/50 p-3 rounded-lg border border-slate-700/50">
+      <!-- Insignia de Nivel de Seguridad -->
+      <div id="levelBadgeContainer" class="p-3 rounded-xl border flex items-center justify-between">
         <div>
-          <span class="text-slate-400 block text-[10px] uppercase font-semibold">Propietario / Responsable</span>
+          <span id="levelBadgeText" class="text-xs font-black uppercase tracking-wider block"></span>
+          <span id="levelBadgeDesc" class="text-[10px] opacity-80"></span>
+        </div>
+        <div id="levelBadgeIcon" class="w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-xs"></div>
+      </div>
+
+      <!-- Información Principal -->
+      <div class="space-y-1">
+        <h2 id="tiendaNombre" class="text-lg font-bold text-white leading-tight"></h2>
+        <p id="tiendaRif" class="text-xs font-mono text-slate-400"></p>
+      </div>
+
+      <!-- Datos Validados -->
+      <div class="grid grid-cols-2 gap-2 text-xs bg-slate-950/70 p-3 rounded-xl border border-slate-800/80">
+        <div>
+          <span class="text-slate-500 block text-[9px] uppercase font-bold">Propietario Legal</span>
           <span id="propietarioVal" class="text-slate-200 font-medium"></span>
         </div>
         <div>
-          <span class="text-slate-400 block text-[10px] uppercase font-semibold">Teléfono de Contacto</span>
+          <span class="text-slate-500 block text-[9px] uppercase font-bold">Contacto Oficial</span>
           <span id="telefonoVal" class="text-slate-200 font-medium"></span>
         </div>
         <div class="col-span-2">
-          <span class="text-slate-400 block text-[10px] uppercase font-semibold">Ubicación Física</span>
+          <span class="text-slate-500 block text-[9px] uppercase font-bold">Ubicación Registrada</span>
           <span id="direccionVal" class="text-slate-200 font-medium"></span>
         </div>
       </div>
 
-      <!-- Compartir -->
-      <div class="pt-2">
-        <button id="shareBtn" type="button" class="w-full bg-slate-700 active:bg-slate-600 text-xs font-bold py-3 px-4 rounded flex items-center justify-center gap-2 transition touch-manipulation">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
-          </svg>
-          Copiar Enlace para Compartir
+      <!-- Pago Móvil Verificado -->
+      <div id="pagoMovilBox" class="bg-emerald-950/30 border border-emerald-500/30 p-3 rounded-xl space-y-1">
+        <div class="flex items-center gap-1.5 text-emerald-400 text-xs font-bold">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Pago Móvil Autorizado
+        </div>
+        <div class="grid grid-cols-3 gap-1 text-[11px] text-slate-300 font-mono pt-1">
+          <div><span class="text-slate-500 block text-[9px]">BANCO</span><span id="pmBanco"></span></div>
+          <div><span class="text-slate-500 block text-[9px]">CI/RIF</span><span id="pmCedula"></span></div>
+          <div><span class="text-slate-500 block text-[9px]">TELÉFONO</span><span id="pmTelefono"></span></div>
+        </div>
+      </div>
+
+      <!-- Botones de Acción -->
+      <div class="space-y-2 pt-1">
+        <button id="shareBtn" type="button" class="w-full bg-slate-800 active:bg-slate-700 text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition touch-manipulation">
+          Copiar Certificado Digital
         </button>
-        <p id="copyMsg" class="text-[10px] text-green-400 text-center mt-2 hidden font-semibold">¡Enlace copiado al portapapeles!</p>
+        <p id="copyMsg" class="text-[10px] text-emerald-400 text-center hidden font-bold">¡Enlace de verificación copiado!</p>
+        
+        <button id="reportBtn" type="button" class="w-full text-[10px] text-rose-400/80 hover:text-rose-400 underline text-center block pt-1">
+          ¿Inconsistencia o intento de fraude? Reportar este comercio
+        </button>
       </div>
 
     </div>
 
-    <!-- No encontrado -->
-    <div id="notFoundCard" class="hidden text-center py-6 border-t border-slate-700 mt-4">
-      <p class="text-sm text-red-400 font-semibold">No se encontró ningún comercio con ese identificador.</p>
-      <p class="text-xs text-slate-400 mt-1">Verifica el nombre o asegúrate de que esté registrado.</p>
+    <!-- Alerta No Encontrado -->
+    <div id="notFoundCard" class="hidden text-center py-6 border-t border-slate-800">
+      <p class="text-xs text-rose-400 font-bold">Comercio No Verificado o Inexistente</p>
+      <p class="text-[11px] text-slate-400 mt-1">Este comercio no cuenta con sello de seguridad activo en Verifik Shield.</p>
     </div>
 
   </div>
@@ -106,11 +118,8 @@
     const merchantCard = document.getElementById('merchantCard');
     const notFoundCard = document.getElementById('notFoundCard');
 
-    // Función limpia de búsqueda
     async function fetchMerchant(id) {
       if (!id) return;
-
-      // Limpiar espacios en blanco, comillas o mayúsculas
       const cleanId = id.toString().trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
       if (!cleanId) return;
 
@@ -133,10 +142,49 @@
 
         document.getElementById('tiendaNombre').innerText = data.tienda || 'Comercio Registrado';
         document.getElementById('tiendaRif').innerText = 'RIF: ' + (data.rif || 'N/A');
-        document.getElementById('categoriaBadge').innerText = data.categoria || 'General';
         document.getElementById('propietarioVal').innerText = data.propietario || 'No especificado';
         document.getElementById('telefonoVal').innerText = data.telefono || 'No especificado';
         document.getElementById('direccionVal').innerText = data.direccion || 'Maturín, Monagas';
+
+        // Renderizar Nivel de Verificación
+        const lvl = parseInt(data.nivel_verificacion) || 1;
+        const badgeContainer = document.getElementById('levelBadgeContainer');
+        const badgeText = document.getElementById('levelBadgeText');
+        const badgeDesc = document.getElementById('levelBadgeDesc');
+        const badgeIcon = document.getElementById('levelBadgeIcon');
+
+        if (lvl === 3) {
+          badgeContainer.className = "p-3 rounded-xl border border-amber-500/40 bg-amber-950/20";
+          badgeText.className = "text-xs font-black uppercase tracking-wider block text-amber-300";
+          badgeText.innerText = "Nivel 3 - Empresa Certificada";
+          badgeDesc.innerText = "Registro Mercantil y Auditoría Legal Completa";
+          badgeIcon.className = "w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-xs bg-amber-500 text-slate-950";
+          badgeIcon.innerText = "3★";
+        } else if (lvl === 2) {
+          badgeContainer.className = "p-3 rounded-xl border border-emerald-500/40 bg-emerald-950/20";
+          badgeText.className = "text-xs font-black uppercase tracking-wider block text-emerald-300";
+          badgeText.innerText = "Nivel 2 - Comercial Verificado";
+          badgeDesc.innerText = "RIF, Pago Móvil y Ubicación Física Validados";
+          badgeIcon.className = "w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-xs bg-emerald-500 text-slate-950";
+          badgeIcon.innerText = "2★";
+        } else {
+          badgeContainer.className = "p-3 rounded-xl border border-blue-500/40 bg-blue-950/20";
+          badgeText.className = "text-xs font-black uppercase tracking-wider block text-blue-300";
+          badgeText.innerText = "Nivel 1 - Identidad Básica";
+          badgeDesc.innerText = "Teléfono y Cédula/RIF Verificado";
+          badgeIcon.className = "w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-xs bg-blue-500 text-slate-950";
+          badgeIcon.innerText = "1★";
+        }
+
+        // Renderizar Pago Móvil
+        if (data.banco_pago_movil && data.cedula_pago_movil) {
+          document.getElementById('pagoMovilBox').classList.remove('hidden');
+          document.getElementById('pmBanco').innerText = data.banco_pago_movil;
+          document.getElementById('pmCedula').innerText = data.cedula_pago_movil;
+          document.getElementById('pmTelefono').innerText = data.telefono_pago_movil || data.telefono;
+        } else {
+          document.getElementById('pagoMovilBox').classList.add('hidden');
+        }
 
         merchantCard.classList.remove('hidden');
       } catch (err) {
@@ -145,18 +193,12 @@
       }
     }
 
-    // Eventos táctiles para botones móviles
     const executeSearch = () => fetchMerchant(searchInput.value);
-
     searchBtn.addEventListener('click', executeSearch);
     searchInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        searchInput.blur(); // Ocultar teclado en móvil
-        executeSearch();
-      }
+      if (e.key === 'Enter') { searchInput.blur(); executeSearch(); }
     });
 
-    // Detectar si se accede directo por URL desde WhatsApp / Instagram
     window.addEventListener('DOMContentLoaded', () => {
       const urlParams = new URLSearchParams(window.location.search);
       const idFromUrl = urlParams.get('id');
@@ -166,16 +208,13 @@
       }
     });
 
-    // Portapapeles compatible con teléfonos moviles (iOS y Android)
     document.getElementById('shareBtn').addEventListener('click', async () => {
       const currentId = searchInput.value.trim().toLowerCase();
       const shareUrl = `${window.location.origin}/verify?id=${currentId}`;
-      
       try {
         if (navigator.clipboard && window.isSecureContext) {
           await navigator.clipboard.writeText(shareUrl);
         } else {
-          // Fallback para navegadores antiguos de teléfonos
           const textArea = document.createElement("textarea");
           textArea.value = shareUrl;
           document.body.appendChild(textArea);
@@ -183,13 +222,26 @@
           document.execCommand('copy');
           document.body.removeChild(textArea);
         }
-        
         const copyMsg = document.getElementById('copyMsg');
         copyMsg.classList.remove('hidden');
         setTimeout(() => copyMsg.classList.add('hidden'), 3000);
-      } catch (err) {
-        console.error('Error al copiar', err);
-      }
+      } catch (err) {}
+    });
+
+    document.getElementById('reportBtn').addEventListener('click', async () => {
+      const currentId = searchInput.value.trim().toLowerCase();
+      const motivo = prompt("Describe brevemente el motivo del reporte/denuncia:");
+      if (!motivo) return;
+      const contacto = prompt("Tu correo o teléfono de contacto para seguimiento:");
+      
+      try {
+        const res = await fetch('/api/reports', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ merchant_id: currentId, motivo, contacto_denunciante: contacto })
+        });
+        if (res.ok) alert("Reporte enviado exitosamente. El equipo de Verifik auditorá este caso.");
+      } catch(e) { alert("Error al enviar el reporte."); }
     });
   </script>
 

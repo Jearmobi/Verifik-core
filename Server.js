@@ -30,7 +30,7 @@ app.get('/admin', (req, res) => {
 // 1. ENDPOINT: Registro de Comercio con Nivel de Seguridad
 app.post(['/api/register', '/api/merchants/register'], (req, res) => {
   try {
-    const { 
+    const {
       id, tienda, rif, colorMarca, categoria, propietario, telefono, direccion,
       instagram, maps_link, banco_pago_movil, cedula_pago_movil, telefono_pago_movil, nivel_verificacion
     } = req.body;
@@ -49,9 +49,9 @@ app.post(['/api/register', '/api/merchants/register'], (req, res) => {
       banco_pago_movil: banco_pago_movil || '',
       cedula_pago_movil: cedula_pago_movil || '',
       telefono_pago_movil: telefono_pago_movil || '',
-      nivel_verificacion: parseInt(nivel_verificacion) || 1
+      nivel_verificacion: parseInt(nivel_verificacion) || 1,
+      secret: Math.random().toString(36).substring(2) + Date.now().toString(36)
     }]);
-
     const options = {
       hostname: SUPABASE_HOST,
       port: 443,

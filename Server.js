@@ -1,39 +1,43 @@
-const express = require('express');
-const path = require('path');
-const https = require('https');
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import https from 'https';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-const SUPABASE_HOST = 'rwovvnzlaqiqrmngitxo.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3b3Z2bnpsYXFpcXJtbmdpdHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MjM1MDMsImV4cCI6MjEwNjE5OTUwM30.XffoL0XBGKnjn3j-TcOKStP0RE-BBNsgaPUgq-B2orU';
-
-// CORS Universal para Navegadores Web y WebView (Instagram/WhatsApp)
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization, apikey');
-  if (req.method === 'OPTIONS') return res.sendStatus(200);
-  next();
-});
+const SUPABASE_HOST = process.env.SUPABASE_HOST || 'yvdexfuyqmsdxfkndoxg.supabase.co';
+const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Rutas de Navegación HTML
-app.get('/', (req, res) => res.redirect('/register'));
+// Servir archivos HTML sin extension
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'verify.html')));
+app.get('/verify', (req, res) => res.sendFile(path.join(__dirname, 'public', 'verify.html')));
 app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
-app.get(/^\/verify/, (req, res) => res.sendFile(path.join(__dirname, 'public', 'verify.html')));
-app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
-});
-// 1. ENDPOINT: Registro de Comercio con Nivel de Seguridad
+app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
+app.get('/client-verify', (req, res) => res.sendFile(path.join(__dirname, 'public', 'client-verify.html')));
+
+// API Endpoint para Registro de Comercio
 app.post(['/api/register', '/api/merchants/register'], (req, res) => {
   try {
     const {
       id, tienda, rif, colorMarca, categoria, propietario, telefono, direccion,
-      instagram, maps_link, banco_pago_movil, cedula_pago_movil, telefono_pago_movil, nivel_verificacion
+      instagram, maps_link, banco_pago_movil, cedula_pago_movil, telefono_pago_movil
     } = req.body;
+
+    // Asignación automática del nivel de verificación
+    let nivelCalculado = 1;
+    const tienePagoMovil = banco_pago_movil && cedula_pago_movil && telefono_pago_movil;
+    const tieneRedesYDireccion = instagram && direccion;
+
+    if (tienePagoMovil && tieneRedesYDireccion) {
+      nivelCalculado = 2; // Sube a Nivel 2 si aporta Pago Móvil + Dirección + IG
+    }
 
     const payload = JSON.stringify([{
       id: id ? id.toLowerCase().trim() : '',
@@ -49,9 +53,10 @@ app.post(['/api/register', '/api/merchants/register'], (req, res) => {
       banco_pago_movil: banco_pago_movil || '',
       cedula_pago_movil: cedula_pago_movil || '',
       telefono_pago_movil: telefono_pago_movil || '',
-      nivel_verificacion: parseInt(nivel_verificacion) || 1,
+      nivel_verificacion: nivelCalculado,
       secret: Math.random().toString(36).substring(2) + Date.now().toString(36)
     }]);
+
     const options = {
       hostname: SUPABASE_HOST,
       port: 443,
@@ -61,106 +66,33 @@ app.post(['/api/register', '/api/merchants/register'], (req, res) => {
         'Content-Type': 'application/json',
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Prefer': 'return=minimal',
-        'Content-Length': Buffer.byteLength(payload)
+        'Prefer': 'return=representation'
       }
     };
 
     const request = https.request(options, (response) => {
       let data = '';
-      response.on('data', (chunk) => { data += chunk; });
+      response.on('data', (chunk) => data += chunk);
       response.on('end', () => {
         if (response.statusCode >= 200 && response.statusCode < 300) {
-          return res.json({ exito: true, mensaje: 'Comercio registrado exitosamente con nivel de seguridad.' });
+          res.status(200).json({ success: true, data: JSON.parse(data) });
         } else {
-          return res.status(response.statusCode).json({ exito: false, error: data });
+          res.status(response.statusCode).json({ success: false, error: data });
         }
       });
     });
 
-    request.on('error', (err) => res.status(500).json({ exito: false, mensaje: err.message }));
+    request.on('error', (e) => {
+      res.status(500).json({ success: false, error: e.message });
+    });
+
     request.write(payload);
     request.end();
-
-  } catch (error) {
-    res.status(500).json({ exito: false, mensaje: 'Error interno del servidor' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
   }
 });
 
-// 2. ENDPOINT: Consulta Pública de Comercio por ID
-app.get('/api/merchants/:id', (req, res) => {
-  const merchantId = req.params.id.toLowerCase().trim();
-
-  const options = {
-    hostname: SUPABASE_HOST,
-    port: 443,
-    path: `/rest/v1/merchants?id=eq.${encodeURIComponent(merchantId)}&select=*`,
-    method: 'GET',
-    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
-  };
-
-  const request = https.request(options, (response) => {
-    let data = '';
-    response.on('data', (chunk) => { data += chunk; });
-    response.on('end', () => {
-      try {
-        const result = JSON.parse(data);
-        if (Array.isArray(result) && result.length > 0) {
-          return res.json({ exito: true, comercio: result[0] });
-        } else {
-          return res.status(404).json({ exito: false, mensaje: 'Comercio no encontrado' });
-        }
-      } catch (err) {
-        return res.status(500).json({ exito: false, mensaje: 'Error parsing JSON' });
-      }
-    });
-  });
-
-  request.on('error', (err) => res.status(500).json({ exito: false, mensaje: err.message }));
-  request.end();
+app.listen(PORT, () => {
+  console.log(`Verifik Core en ejecución en puerto ${PORT}`);
 });
-
-// 3. ENDPOINT: Registrar Reportes / Denuncias
-app.post('/api/reports', (req, res) => {
-  try {
-    const { merchant_id, motivo, contacto_denunciante } = req.body;
-
-    const payload = JSON.stringify([{
-      merchant_id,
-      motivo,
-      contacto_denunciante,
-      fecha: new Date().toISOString()
-    }]);
-
-    const options = {
-      hostname: SUPABASE_HOST,
-      port: 443,
-      path: '/rest/v1/reports',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Prefer': 'return=minimal',
-        'Content-Length': Buffer.byteLength(payload)
-      }
-    };
-
-    const request = https.request(options, (response) => {
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        return res.json({ exito: true, mensaje: 'Reporte registrado para auditoría.' });
-      }
-      return res.status(400).json({ exito: false, mensaje: 'No se pudo procesar el reporte.' });
-    });
-
-    request.on('error', (err) => res.status(500).json({ exito: false, mensaje: err.message }));
-    request.write(payload);
-    request.end();
-
-  } catch (error) {
-    res.status(500).json({ exito: false, mensaje: 'Error al enviar reporte' });
-  }
-});
-
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => console.log(`Servidor Verifik ejecutándose en puerto ${PORT}`));

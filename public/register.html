@@ -2,135 +2,112 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Verifik Shield - Registro de Comercio</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-3 font-sans">
 
   <div class="max-w-xl w-full bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-6">
-    
-    <!-- Header -->
-    <div class="text-center border-b border-slate-800 pb-4">
-      <div class="inline-flex items-center gap-2 bg-blue-950/60 border border-blue-500/30 px-3 py-1 rounded-full mb-2">
-        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-        </svg>
-        <span class="text-xs font-bold tracking-wider text-blue-300 uppercase">Verifik Shield</span>
+    <div class="text-center space-y-1">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 text-sky-400 text-xs font-semibold uppercase tracking-wider border border-sky-500/20">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        VERIFIK SHIELD
       </div>
-      <h1 class="text-xl font-bold text-white">Registro de Comercio Seguro</h1>
-      <p class="text-xs text-slate-400 mt-1">Completa los datos para dar de alta tu certificado digital anti-fraude</p>
+      <h1 class="text-xl font-bold tracking-tight text-white">Registro de Comercio Seguro</h1>
+      <p class="text-xs text-slate-400">Completa los datos para dar de alta tu certificado digital anti-fraude</p>
     </div>
 
     <form id="registerForm" class="space-y-4">
       
-      <!-- Seccion 1: Identificación -->
-      <div class="space-y-3">
-        <h2 class="text-xs font-bold text-blue-400 uppercase tracking-wider border-b border-slate-800 pb-1">1. Identificación Comercial</h2>
+      <!-- Seccion 1: Identificación Comercial -->
+      <div class="border-b border-slate-800 pb-4 space-y-3">
+        <h2 class="text-xs font-bold text-sky-400 uppercase tracking-wider">1. Identificación Comercial</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label class="block text-[11px] text-slate-400 mb-1">Identificador Único (Slug / ID) *</label>
-            <input type="text" id="id" required placeholder="ej: farmacia-central" 
-              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
-            <span class="text-[9px] text-slate-500">Será tu URL: verify?id=tu-id</span>
+            <input type="text" id="slug" required placeholder="ej: farmacia-central" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-sky-500">
+            <span class="text-[10px] text-slate-500 mt-0.5 block">Será tu URL: verify?id=tu-id</span>
           </div>
 
           <div>
             <label class="block text-[11px] text-slate-400 mb-1">Nombre Comercial de la Tienda *</label>
-            <input type="text" id="tienda" required placeholder="Ej: Farmacia Central Maturín" 
-              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+            <input type="text" id="tienda" required placeholder="Ej: Farmacia Central Maturín" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-sky-500">
           </div>
+        </div>
 
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label class="block text-[11px] text-slate-400 mb-1">RIF de la Empresa / Firma *</label>
-            <input type="text" id="rif" required placeholder="J-50123456-7" 
-              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
+            <input type="text" id="rif" required placeholder="J-50123456-7" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-sky-500">
           </div>
 
           <div>
             <label class="block text-[11px] text-slate-400 mb-1">Propietario o Rep. Legal *</label>
-            <input type="text" id="propietario" required placeholder="Nombre y Apellido" 
-              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+            <input type="text" id="propietario" required placeholder="Nombre y Apellido" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-sky-500">
           </div>
         </div>
       </div>
 
-      <!-- Seccion 2: Contacto y Ubicacion -->
-      <div class="space-y-3">
-        <h2 class="text-xs font-bold text-blue-400 uppercase tracking-wider border-b border-slate-800 pb-1">2. Contacto y Redes Oficiales</h2>
+      <!-- Seccion 2: Contacto y Redes -->
+      <div class="border-b border-slate-800 pb-4 space-y-3">
+        <h2 class="text-xs font-bold text-sky-400 uppercase tracking-wider">2. Contacto y Redes Oficiales</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label class="block text-[11px] text-slate-400 mb-1">Teléfono WhatsApp Oficial *</label>
-            <input type="text" id="telefono" required placeholder="+584141234567" 
-              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500 font-mono">
+            <input type="text" id="telefono" required placeholder="+584141234567" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-sky-500">
           </div>
 
           <div>
             <label class="block text-[11px] text-slate-400 mb-1">Usuario de Instagram (@)</label>
-            <input type="text" id="instagram" placeholder="farmaciacentral" 
-              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
+            <input type="text" id="instagram" placeholder="farmaciacentral" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-sky-500">
           </div>
+        </div>
 
-          <div class="md:col-span-2">
-            <label class="block text-[11px] text-slate-400 mb-1">Dirección / Ubicación Física *</label>
-            <input type="text" id="direccion" required placeholder="Av. Bolívar, Maturín, Monagas" 
-              class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-          </div>
+        <div>
+          <label class="block text-[11px] text-slate-400 mb-1">Dirección / Ubicación Física *</label>
+          <input type="text" id="direccion" required placeholder="Av. Bolívar, Maturín, Monagas" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-sky-500">
         </div>
       </div>
 
-      <!-- Seccion 3: Pago Móvil Oficial -->
-      <div class="space-y-3 bg-slate-950/60 p-3 rounded-xl border border-slate-800">
+      <!-- Seccion 3: Datos de Pago Móvil Autorizados -->
+      <div class="border-b border-slate-800 pb-4 space-y-3">
         <h2 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">3. Datos de Pago Móvil Autorizados</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div>
-            <label class="block text-[10px] text-slate-400 mb-1">Banco</label>
-            <input type="text" id="banco_pago_movil" placeholder="Ej: Banesco / Mercantil" 
-              class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+            <label class="block text-[11px] text-slate-400 mb-1">Banco</label>
+            <input type="text" id="banco_pago_movil" placeholder="Ej: Banesco / Mercantil" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500">
           </div>
 
           <div>
-            <label class="block text-[10px] text-slate-400 mb-1">Cédula / RIF</label>
-            <input type="text" id="cedula_pago_movil" placeholder="J-501234567" 
-              class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-mono">
+            <label class="block text-[11px] text-slate-400 mb-1">Cédula / RIF</label>
+            <input type="text" id="cedula_pago_movil" placeholder="J-501234567" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500">
           </div>
 
           <div>
-            <label class="block text-[10px] text-slate-400 mb-1">Teléfono Pago Móvil</label>
-            <input type="text" id="telefono_pago_movil" placeholder="04141234567" 
-              class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 font-mono">
+            <label class="block text-[11px] text-slate-400 mb-1">Teléfono Pago Móvil</label>
+            <input type="text" id="telefono_pago_movil" placeholder="04141234567" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-emerald-500">
           </div>
         </div>
       </div>
 
-      <!-- Seccion 4: Personalización y Nivel -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <div>
-          <label class="block text-[11px] text-slate-400 mb-1">Color Identificador de Marca</label>
-          <div class="flex items-center gap-2">
-            <input type="color" id="colorMarca" value="#0284c7" class="w-9 h-9 rounded-lg bg-transparent cursor-pointer border-0">
-            <span id="colorHex" class="text-xs font-mono text-slate-400">#0284c7</span>
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-[11px] text-slate-400 mb-1">Nivel de Verificación Inicial</label>
-          <select id="nivel_verificacion" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-            <option value="1">Nivel 1 - Identidad Básica (Cédula/RIF)</option>
-            <option value="2" selected>Nivel 2 - Comercial Verificado (Pago Móvil + Ubicación)</option>
-            <option value="3">Nivel 3 - Empresa Certificada (Auditoría Mercantil)</option>
-          </select>
+      <!-- Seccion 4: Personalización de Marca -->
+      <div>
+        <label class="block text-[11px] text-slate-400 mb-1">Color Identificador de Marca</label>
+        <div class="flex items-center gap-2">
+          <input type="color" id="colorMarca" value="#0284c7" class="w-9 h-9 rounded-lg bg-transparent cursor-pointer border-0">
+          <span id="colorHex" class="text-xs font-mono text-slate-400">#0284c7</span>
         </div>
       </div>
 
-      <!-- Mensaje de Estado -->
-      <div id="statusMsg" class="hidden text-xs text-center p-3 rounded-xl font-bold"></div>
+      <!-- Mensaje de estado -->
+      <div id="statusMessage" class="hidden text-center text-xs p-3 rounded-xl"></div>
 
-      <!-- Boton Enviar -->
-      <button type="submit" id="submitBtn" class="w-full bg-blue-600 active:bg-blue-700 text-xs font-bold py-3 rounded-xl text-white transition touch-manipulation">
+      <!-- Botón de envio -->
+      <button type="submit" id="submitBtn" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-semibold py-3 px-4 rounded-xl text-xs transition duration-200 shadow-lg shadow-sky-600/20">
         Registrar Comercio en Verifik Shield
       </button>
 
@@ -138,73 +115,60 @@
   </div>
 
   <script>
-    const idInput = document.getElementById('id');
-    const colorMarca = document.getElementById('colorMarca');
+    const colorInput = document.getElementById('colorMarca');
     const colorHex = document.getElementById('colorHex');
+    
+    colorInput.addEventListener('input', (e) => {
+      colorHex.textContent = e.target.value;
+    });
+
     const form = document.getElementById('registerForm');
-    const statusMsg = document.getElementById('statusMsg');
+    const statusMsg = document.getElementById('statusMessage');
     const submitBtn = document.getElementById('submitBtn');
 
-    // Auto-formatear Slug/ID a minusculas sin espacios
-    idInput.addEventListener('input', (e) => {
-      e.target.value = e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, '');
-    });
-
-    // Actualizar hex de color
-    colorMarca.addEventListener('input', (e) => {
-      colorHex.innerText = e.target.value;
-    });
-
-    // Envío del Formulario
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-
+      
       submitBtn.disabled = true;
-      submitBtn.innerText = "Procesando registro...";
-      statusMsg.classList.add('hidden');
+      submitBtn.textContent = 'Guardando comercio...';
+      statusMsg.className = 'hidden';
 
       const payload = {
-        id: idInput.value,
+        id: document.getElementById('slug').value,
         tienda: document.getElementById('tienda').value,
         rif: document.getElementById('rif').value,
         propietario: document.getElementById('propietario').value,
         telefono: document.getElementById('telefono').value,
-        direccion: document.getElementById('direccion').value,
         instagram: document.getElementById('instagram').value,
+        direccion: document.getElementById('direccion').value,
         banco_pago_movil: document.getElementById('banco_pago_movil').value,
         cedula_pago_movil: document.getElementById('cedula_pago_movil').value,
         telefono_pago_movil: document.getElementById('telefono_pago_movil').value,
-        colorMarca: colorMarca.value,
-        nivel_verificacion: parseInt(document.getElementById('nivel_verificacion').value)
+        colorMarca: document.getElementById('colorMarca').value
       };
 
       try {
-        const res = await fetch('/api/register', {
+        const response = await fetch('/api/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
 
-        const data = await res.json();
+        const data = await response.json();
 
-        statusMsg.classList.remove('hidden');
-
-        if (res.ok && data.exito) {
-          statusMsg.className = "text-xs text-center p-3 rounded-xl font-bold bg-emerald-950/80 border border-emerald-500/40 text-emerald-300";
-          statusMsg.innerHTML = `¡Comercio registrado con éxito!<br><a href="/verify?id=${payload.id}" target="_blank" class="underline text-white font-mono mt-1 block">Ver Certificado Digital aquí</a>`;
+        if (response.ok && data.success) {
+          statusMsg.className = 'text-center text-xs p-3 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 block';
+          statusMsg.innerHTML = `¡Comercio registrado con éxito! <br><a href="/verify?id=${payload.id}" target="_blank" class="underline font-bold">Ver Certificado</a>`;
           form.reset();
-          colorHex.innerText = "#0284c7";
         } else {
-          statusMsg.className = "text-xs text-center p-3 rounded-xl font-bold bg-rose-950/80 border border-rose-500/40 text-rose-300";
-          statusMsg.innerText = "Error: " + (data.error || data.mensaje || "No se pudo registrar");
+          throw new Error(data.error || 'Error al guardar el comercio');
         }
       } catch (err) {
-        statusMsg.classList.remove('hidden');
-        statusMsg.className = "text-xs text-center p-3 rounded-xl font-bold bg-rose-950/80 border border-rose-500/40 text-rose-300";
-        statusMsg.innerText = "Error de conexión con el servidor.";
+        statusMsg.className = 'text-center text-xs p-3 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20 block';
+        statusMsg.textContent = `Error: ${err.message}`;
       } finally {
         submitBtn.disabled = false;
-        submitBtn.innerText = "Registrar Comercio en Verifik Shield";
+        submitBtn.textContent = 'Registrar Comercio en Verifik Shield';
       }
     });
   </script>

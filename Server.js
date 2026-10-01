@@ -11,14 +11,14 @@ const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Rutas para servir archivos HTML sin extensión
+// Servir vistas HTML
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'verify.html')));
 app.get('/verify', (req, res) => res.sendFile(path.join(__dirname, 'public', 'verify.html')));
 app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
 app.get('/client-verify', (req, res) => res.sendFile(path.join(__dirname, 'public', 'client-verify.html')));
 
-// API: Obtener un comercio por su ID
+// API: Consulta pública de comercio por ID
 app.get('/api/merchants/:id', (req, res) => {
   const merchantId = req.params.id.toLowerCase().trim();
 
@@ -54,7 +54,7 @@ app.get('/api/merchants/:id', (req, res) => {
   request.end();
 });
 
-// API: Listar todos los comercios (Para el Panel Admin)
+// API: Listar todos los comercios para el Admin
 app.get('/api/merchants', (req, res) => {
   const options = {
     hostname: SUPABASE_HOST,
@@ -83,7 +83,7 @@ app.get('/api/merchants', (req, res) => {
   request.end();
 });
 
-// API: Registrar nuevo comercio (con nivel automático)
+// API: Registrar nuevo comercio (con secret y nivel automático)
 app.post(['/api/register', '/api/merchants/register'], (req, res) => {
   try {
     const {

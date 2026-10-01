@@ -10,23 +10,22 @@
 
   <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl space-y-5 relative">
     
-    <!-- Encabezado con Indicador en Vivo -->
+    <!-- Encabezado con Reloj Anti-Captura -->
     <div class="text-center border-b border-slate-800 pb-3">
       <div class="inline-flex items-center gap-2 bg-blue-950/60 border border-blue-500/30 px-3 py-1 rounded-full mb-1">
         <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
         <span class="text-xs font-bold tracking-wider text-blue-300 uppercase">Verifik Shield</span>
       </div>
       <p class="text-[11px] text-slate-400">Verificación Oficial de Identidad Comercial</p>
-      <!-- Anti-Captura: Reloj en Vivo -->
       <p id="liveTimestamp" class="text-[9px] font-mono text-emerald-400/80 mt-1"></p>
     </div>
 
-    <!-- Buscador Móvil -->
+    <!-- Buscador -->
     <div class="flex gap-2">
       <input 
         type="text" 
         id="searchInput" 
-        placeholder="Ej: farmacia-central" 
+        placeholder="Ej: bodega-jesus" 
         autocorrect="off" 
         autocapitalize="none" 
         spellcheck="false"
@@ -37,15 +36,15 @@
       </button>
     </div>
 
-    <!-- Indicador Carga -->
+    <!-- Carga -->
     <div id="loading" class="hidden text-center py-6 text-xs text-slate-400 animate-pulse">
       Validando credenciales comerciales...
     </div>
 
-    <!-- Ficha de Verificación -->
+    <!-- Ficha del Certificado -->
     <div id="merchantCard" class="hidden space-y-4">
       
-      <!-- Insignia de Nivel de Seguridad -->
+      <!-- Insignia de Nivel -->
       <div id="levelBadgeContainer" class="p-3 rounded-xl border flex items-center justify-between">
         <div>
           <span id="levelBadgeText" class="text-xs font-black uppercase tracking-wider block"></span>
@@ -54,13 +53,13 @@
         <div id="levelBadgeIcon" class="w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-xs"></div>
       </div>
 
-      <!-- Información Principal -->
+      <!-- Nombre y RIF -->
       <div class="space-y-1">
         <h2 id="tiendaNombre" class="text-lg font-bold text-white leading-tight"></h2>
         <p id="tiendaRif" class="text-xs font-mono text-slate-400"></p>
       </div>
 
-      <!-- Red Social Oficial (Anti-Phishing) -->
+      <!-- Instagram Oficial (Anti-Phishing) -->
       <div id="instagramContainer" class="hidden">
         <a id="instagramBtn" href="#" target="_blank" rel="noopener noreferrer" class="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg hover:opacity-95 transition">
           <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
@@ -84,7 +83,7 @@
         </div>
       </div>
 
-      <!-- Pago Móvil Verificado con Alerta de Seguridad -->
+      <!-- Pago Móvil Verificado -->
       <div id="pagoMovilBox" class="bg-emerald-950/30 border border-emerald-500/40 p-3 rounded-xl space-y-2">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-1.5 text-emerald-400 text-xs font-bold">
@@ -104,7 +103,7 @@
           ⚠️ <strong>ALERTA DE SEGURIDAD:</strong> Paga exclusivamente a los datos mostrados arriba. Si el vendedor te indica otro Pago Móvil, cancela la operación inmediatamente.
         </p>
 
-        <!-- Validador Dinámico en Tiempo Real -->
+        <!-- Validador Dinámico -->
         <div class="pt-1 border-t border-slate-800/80 space-y-1.5">
           <label class="block text-[10px] text-slate-400 font-bold uppercase">Verificador de Coincidencia de Pago</label>
           <div class="flex gap-1.5">
@@ -121,15 +120,11 @@
           Copiar Certificado Digital
         </button>
         <p id="copyMsg" class="text-[10px] text-emerald-400 text-center hidden font-bold">¡Enlace de verificación copiado!</p>
-        
-        <button id="reportBtn" type="button" class="w-full text-[10px] text-rose-400/80 hover:text-rose-400 underline text-center block pt-1">
-          ¿Inconsistencia o intento de fraude? Reportar este comercio
-        </button>
       </div>
 
     </div>
 
-    <!-- Alerta No Encontrado -->
+    <!-- No Encontrado -->
     <div id="notFoundCard" class="hidden text-center py-6 border-t border-slate-800">
       <p class="text-xs text-rose-400 font-bold">Comercio No Verificado o Inexistente</p>
       <p class="text-[11px] text-slate-400 mt-1">Este comercio no cuenta con sello de seguridad activo en Verifik Shield.</p>
@@ -145,7 +140,6 @@
     const notFoundCard = document.getElementById('notFoundCard');
     let currentMerchantData = null;
 
-    // Actualizador de Reloj Anti-Captura de Pantalla
     function updateTimestamp() {
       const now = new Date();
       document.getElementById('liveTimestamp').innerText = `Validado en Vivo: ${now.toLocaleDateString()} - ${now.toLocaleTimeString()}`;
@@ -155,7 +149,8 @@
 
     async function fetchMerchant(id) {
       if (!id) return;
-      const cleanId = id.toString().trim().toLowerCase().replace(/[^a-z0-9_-]/g, '');
+      // Convierte a minúsculas y reemplaza espacios por guiones automáticamente
+      const cleanId = id.toString().trim().toLowerCase().replace(/\s+/g, '-');
       if (!cleanId) return;
 
       loading.classList.remove('hidden');
@@ -182,7 +177,7 @@
         document.getElementById('telefonoVal').innerText = data.telefono || 'No especificado';
         document.getElementById('direccionVal').innerText = data.direccion || 'Maturín, Monagas';
 
-        // Red Social Oficial (Instagram)
+        // Instagram
         const instagramContainer = document.getElementById('instagramContainer');
         const instagramBtn = document.getElementById('instagramBtn');
         if (data.instagram) {
@@ -197,7 +192,7 @@
           instagramContainer.classList.add('hidden');
         }
 
-        // Renderizar Nivel de Verificación
+        // Nivel de Verificación
         const lvl = parseInt(data.nivel_verificacion) || 1;
         const badgeContainer = document.getElementById('levelBadgeContainer');
         const badgeText = document.getElementById('levelBadgeText');
@@ -227,7 +222,7 @@
           badgeIcon.innerText = "1★";
         }
 
-        // Renderizar Pago Móvil
+        // Pago Móvil
         if (data.banco_pago_movil && data.cedula_pago_movil) {
           document.getElementById('pagoMovilBox').classList.remove('hidden');
           document.getElementById('pmBanco').innerText = data.banco_pago_movil;
@@ -244,7 +239,7 @@
       }
     }
 
-    // Lógica del Validador Dinámico de Pago Móvil
+    // Validador de Pago
     document.getElementById('verifyPayBtn').addEventListener('click', () => {
       const inputVal = document.getElementById('verifyPayInput').value.replace(/[^0-9]/g, '');
       const resultEl = document.getElementById('verifyPayResult');
@@ -275,13 +270,13 @@
       const urlParams = new URLSearchParams(window.location.search);
       const idFromUrl = urlParams.get('id');
       if (idFromUrl) {
-        searchInput.value = idFromUrl.trim().toLowerCase();
+        searchInput.value = idFromUrl.trim();
         fetchMerchant(idFromUrl);
       }
     });
 
     document.getElementById('shareBtn').addEventListener('click', async () => {
-      const currentId = searchInput.value.trim().toLowerCase();
+      const currentId = searchInput.value.trim().toLowerCase().replace(/\s+/g, '-');
       const shareUrl = `${window.location.origin}/verify?id=${currentId}`;
       try {
         if (navigator.clipboard && window.isSecureContext) {
@@ -298,22 +293,6 @@
         copyMsg.classList.remove('hidden');
         setTimeout(() => copyMsg.classList.add('hidden'), 3000);
       } catch (err) {}
-    });
-
-    document.getElementById('reportBtn').addEventListener('click', async () => {
-      const currentId = searchInput.value.trim().toLowerCase();
-      const motivo = prompt("Describe brevemente el motivo del reporte/denuncia:");
-      if (!motivo) return;
-      const contacto = prompt("Tu correo o teléfono de contacto para seguimiento:");
-      
-      try {
-        const res = await fetch('/api/reports', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ merchant_id: currentId, motivo, contacto_denunciante: contacto })
-        });
-        if (res.ok) alert("Reporte enviado exitosamente. El equipo de Verifik auditorá este caso.");
-      } catch(e) { alert("Error al enviar el reporte."); }
     });
   </script>
 

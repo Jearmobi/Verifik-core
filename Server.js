@@ -12,24 +12,24 @@ const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Función para generar un PIN dinámico de 6 dígitos basado en bloques de tiempo (30 segundos)
+// Función para generar un PIN dinámico de 6 dígitos basado en bloques de 30 segundos (TOTP)
 function generateDynamicToken(secret) {
-  const epoch = Math.floor(Date.now() / 30000); // Bloque de 30s
+  const epoch = Math.floor(Date.now() / 30000);
   const hash = crypto.createHmac('sha256', secret || 'verifik-default-key')
                      .update(epoch.toString())
                      .digest('hex');
-  // Extraer 6 dígitos numéricos
   const pin = (parseInt(hash.substring(0, 8), 16) % 1000000).toString().padStart(6, '0');
   return pin;
 }
 
-// Servir vistas HTML
+// Servir vistas HTML estáticas
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'verify.html')));
 app.get('/verify', (req, res) => res.sendFile(path.join(__dirname, 'public', 'verify.html')));
 app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
+app.get('/client-verify', (req, res) => res.sendFile(path.join(__dirname, 'public', 'client-verify.html')));
 
-// API: Obtener Token Dinámico del Día/Minuto para un comercio
+// API: Obtener Token Dinámico del momento para un comercio
 app.get('/api/merchants/:id/token', (req, res) => {
   const merchantId = req.params.id.toLowerCase().trim();
 
@@ -101,7 +101,7 @@ app.post('/api/merchants/:id/verify-token', (req, res) => {
           res.status(200).json({
             exito: true,
             valido: isValido,
-            mensaje: isValido ? '🟢 PIN Dinámico Correcto - Verificación de Tiempo Real Exitosa' : '❌ PIN Expirado o Inválido'
+            mensaje: isValido ? '🟢 PIN Dinámico Correcto - Verificación en Tiempo Real Exitosa' : '❌ PIN Expirado o Inválido'
           });
         } else {
           res.status(404).json({ exito: false, mensaje: 'Comercio no encontrado' });
@@ -152,7 +152,7 @@ app.get('/api/merchants/:id', (req, res) => {
   request.end();
 });
 
-// API: Listar todos los comercios
+// API: Listar todos los comercios para el Admin
 app.get('/api/merchants', (req, res) => {
   const options = {
     hostname: SUPABASE_HOST,
@@ -250,7 +250,7 @@ app.post(['/api/register', '/api/merchants/register'], (req, res) => {
   }
 });
 
-// API: Actualizar comercio desde el Panel Admin
+// API: Actualizar datos de un comercio desde el Panel Admin
 app.patch('/api/merchants/:id', (req, res) => {
   try {
     const merchantId = req.params.id.toLowerCase().trim();

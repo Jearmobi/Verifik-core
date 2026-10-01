@@ -12,9 +12,9 @@ const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Función para generar un PIN dinámico de 6 dígitos basado en bloques de 30 segundos (TOTP)
+// Función para generar un PIN dinámico de 6 dígitos basado en bloques de 3 minutos (180,000 ms)
 function generateDynamicToken(secret) {
-  const epoch = Math.floor(Date.now() / 30000);
+  const epoch = Math.floor(Date.now() / 180000); 
   const hash = crypto.createHmac('sha256', secret || 'verifik-default-key')
                      .update(epoch.toString())
                      .digest('hex');
@@ -53,10 +53,15 @@ app.get('/api/merchants/:id/token', (req, res) => {
         if (response.statusCode === 200 && parsed.length > 0) {
           const secret = parsed[0].secret || merchantId;
           const currentToken = generateDynamicToken(secret);
+          
+          // Tiempo restante del bloque actual de 180s
+          const secondsIntoEpoch = Math.floor(Date.now() / 1000) % 180;
+          const expiresInSeconds = 180 - secondsIntoEpoch;
+
           res.status(200).json({ 
             exito: true, 
             token: currentToken,
-            expiresInSeconds: 30 - (Math.floor(Date.now() / 1000) % 30)
+            expiresInSeconds: expiresInSeconds
           });
         } else {
           res.status(404).json({ exito: false, mensaje: 'Comercio no encontrado' });

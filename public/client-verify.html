@@ -25,7 +25,7 @@
 
     <!-- Bloque de PIN Dinámico -->
     <div class="bg-slate-950 border border-slate-800 rounded-2xl p-6 space-y-3 shadow-inner relative">
-      <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500 block">Código Rotativo (30s)</span>
+      <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500 block">Código Rotativo (Válido 3 min)</span>
       
       <div id="pinDisplay" class="text-4xl font-mono font-black tracking-[0.25em] text-emerald-400 py-2 select-all">
         ------
@@ -36,7 +36,7 @@
         <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
           <div id="progressBar" class="bg-emerald-500 h-full w-full transition-all duration-1000 linear"></div>
         </div>
-        <p id="timerText" class="text-[10px] font-mono text-slate-400">Rotando en -- segundos...</p>
+        <p id="timerText" class="text-[10px] font-mono text-slate-400">Rotando en --:--</p>
       </div>
     </div>
 
@@ -62,7 +62,7 @@
 
     document.getElementById('merchantTitle').innerText = merchantId.toUpperCase().replace(/-/g, ' ');
 
-    let timeLeft = 30;
+    let timeLeft = 180;
 
     async function updatePin() {
       try {
@@ -71,7 +71,7 @@
 
         if (res.ok && data.exito) {
           document.getElementById('pinDisplay').innerText = data.token;
-          timeLeft = data.expiresInSeconds || 30;
+          timeLeft = data.expiresInSeconds || 180;
           updateTimerUI();
         } else {
           document.getElementById('pinDisplay').innerText = "ERROR";
@@ -82,8 +82,12 @@
     }
 
     function updateTimerUI() {
-      document.getElementById('timerText').innerText = `Rotando en ${timeLeft}s...`;
-      const percentage = (timeLeft / 30) * 100;
+      const minutes = Math.floor(timeLeft / 60);
+      const seconds = timeLeft % 60;
+      const formattedTime = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+      
+      document.getElementById('timerText').innerText = `Rotando en ${formattedTime} min...`;
+      const percentage = (timeLeft / 180) * 100;
       document.getElementById('progressBar').style.width = `${percentage}%`;
     }
 

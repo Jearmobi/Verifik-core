@@ -1,13 +1,9 @@
-import express from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import https from 'https';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const express = require('express');
+const path = require('path');
+const https = require('https');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 
 const SUPABASE_HOST = process.env.SUPABASE_HOST || 'yvdexfuyqmsdxfkndoxg.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
@@ -15,7 +11,7 @@ const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Servir archivos HTML sin extension
+// Servir archivos HTML sin extensión
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'verify.html')));
 app.get('/verify', (req, res) => res.sendFile(path.join(__dirname, 'public', 'verify.html')));
 app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
@@ -53,8 +49,7 @@ app.post(['/api/register', '/api/merchants/register'], (req, res) => {
       banco_pago_movil: banco_pago_movil || '',
       cedula_pago_movil: cedula_pago_movil || '',
       telefono_pago_movil: telefono_pago_movil || '',
-      nivel_verificacion: nivelCalculado,
-      secret: Math.random().toString(36).substring(2) + Date.now().toString(36)
+      nivel_verificacion: nivelCalculado
     }]);
 
     const options = {

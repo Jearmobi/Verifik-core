@@ -12,7 +12,7 @@ const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Función para generar un PIN dinámico de 6 dígitos basado en bloques de 3 minutos (180,000 ms)
+// Función para generar PIN dinámico de 6 dígitos rotativo cada 3 minutos (180,000 ms)
 function generateDynamicToken(secret) {
   const epoch = Math.floor(Date.now() / 180000); 
   const hash = crypto.createHmac('sha256', secret || 'verifik-default-key')
@@ -22,14 +22,22 @@ function generateDynamicToken(secret) {
   return pin;
 }
 
-// Servir vistas HTML estáticas
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'verify.html')));
-app.get('/verify', (req, res) => res.sendFile(path.join(__dirname, 'public', 'verify.html')));
-app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
-app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
-app.get('/client-verify', (req, res) => res.sendFile(path.join(__dirname, 'public', 'client-verify.html')));
+// Desactivar caché del navegador para vistas HTML
+const noCache = (req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
+};
 
-// API: Obtener Token Dinámico del momento para un comercio
+// Rutas estáticas
+app.get('/', noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'verify.html')));
+app.get('/verify', noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'verify.html')));
+app.get('/register', noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
+app.get('/admin', noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
+app.get('/client-verify', noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'client-verify.html')));
+
+// API: Obtener PIN actual de 3 minutos
 app.get('/api/merchants/:id/token', (req, res) => {
   const merchantId = req.params.id.toLowerCase().trim();
 
@@ -54,7 +62,6 @@ app.get('/api/merchants/:id/token', (req, res) => {
           const secret = parsed[0].secret || merchantId;
           const currentToken = generateDynamicToken(secret);
           
-          // Tiempo restante del bloque actual de 180s
           const secondsIntoEpoch = Math.floor(Date.now() / 1000) % 180;
           const expiresInSeconds = 180 - secondsIntoEpoch;
 
@@ -76,7 +83,7 @@ app.get('/api/merchants/:id/token', (req, res) => {
   request.end();
 });
 
-// API: Validar PIN ingresado por el cliente en el certificado
+// API: Validar PIN ingresado por el cliente
 app.post('/api/merchants/:id/verify-token', (req, res) => {
   const merchantId = req.params.id.toLowerCase().trim();
   const { userPin } = req.body;
@@ -157,7 +164,7 @@ app.get('/api/merchants/:id', (req, res) => {
   request.end();
 });
 
-// API: Listar todos los comercios para el Admin
+// API: Listar comercios (Admin)
 app.get('/api/merchants', (req, res) => {
   const options = {
     hostname: SUPABASE_HOST,
@@ -255,7 +262,7 @@ app.post(['/api/register', '/api/merchants/register'], (req, res) => {
   }
 });
 
-// API: Actualizar datos de un comercio desde el Panel Admin
+// API: Editar comercio
 app.patch('/api/merchants/:id', (req, res) => {
   try {
     const merchantId = req.params.id.toLowerCase().trim();
@@ -295,5 +302,5 @@ app.patch('/api/merchants/:id', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Verifik Core en ejecución en puerto ${PORT}`);
+  console.log(`Verifik Core ejecutándose en puerto ${PORT}`);
 });

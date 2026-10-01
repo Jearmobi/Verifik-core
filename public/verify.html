@@ -3,349 +3,296 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Verifik Shield - Certificado Digital de Seguridad</title>
+  <title>Verifik Shield - Certificado de Verificación Comercial</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-3 font-sans">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4 font-sans">
 
-  <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl space-y-5 relative">
+  <div class="max-w-lg w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 relative overflow-hidden">
     
-    <!-- Encabezado con Reloj Anti-Captura -->
-    <div class="text-center border-b border-slate-800 pb-3">
-      <div class="inline-flex items-center gap-2 bg-blue-950/60 border border-blue-500/30 px-3 py-1 rounded-full mb-1">
-        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-        <span class="text-xs font-bold tracking-wider text-blue-300 uppercase">Verifik Shield</span>
-      </div>
-      <p class="text-[11px] text-slate-400">Verificación Oficial de Identidad Comercial</p>
-      <p id="liveTimestamp" class="text-[9px] font-mono text-emerald-400/80 mt-1"></p>
-    </div>
+    <!-- Decoración de Fondo -->
+    <div class="absolute -top-12 -left-12 w-40 h-40 bg-blue-600/10 rounded-full blur-3xl"></div>
 
-    <!-- Buscador -->
-    <div class="flex gap-2">
-      <input 
-        type="text" 
-        id="searchInput" 
-        placeholder="Ej: bodega-jesus" 
-        autocorrect="off" 
-        autocapitalize="none" 
-        spellcheck="false"
-        class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-blue-500 transition"
-      >
-      <button id="searchBtn" type="button" class="bg-blue-600 active:bg-blue-700 text-xs font-bold px-4 py-2 rounded-xl text-white transition touch-manipulation">
-        Buscar
-      </button>
-    </div>
-
-    <!-- Carga -->
-    <div id="loading" class="hidden text-center py-6 text-xs text-slate-400 animate-pulse">
-      Validando credenciales comerciales...
-    </div>
-
-    <!-- Ficha del Certificado -->
-    <div id="merchantCard" class="hidden space-y-4">
-      
-      <!-- Insignia de Nivel -->
-      <div id="levelBadgeContainer" class="p-3 rounded-xl border flex items-center justify-between">
-        <div>
-          <span id="levelBadgeText" class="text-xs font-black uppercase tracking-wider block"></span>
-          <span id="levelBadgeDesc" class="text-[10px] opacity-80"></span>
-        </div>
-        <div id="levelBadgeIcon" class="w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-xs"></div>
-      </div>
-
-      <!-- Nombre y RIF -->
-      <div class="space-y-1">
-        <h2 id="tiendaNombre" class="text-lg font-bold text-white leading-tight"></h2>
-        <p id="tiendaRif" class="text-xs font-mono text-slate-400"></p>
-      </div>
-
-      <!-- Instagram Oficial (Anti-Phishing) -->
-      <div id="instagramContainer" class="hidden">
-        <a id="instagramBtn" href="#" target="_blank" rel="noopener noreferrer" class="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg hover:opacity-95 transition">
-          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-          Abrir Instagram Oficial Registrado
-        </a>
-      </div>
-
-      <!-- Datos Validados -->
-      <div class="grid grid-cols-2 gap-2 text-xs bg-slate-950/70 p-3 rounded-xl border border-slate-800/80">
-        <div>
-          <span class="text-slate-500 block text-[9px] uppercase font-bold">Propietario Legal</span>
-          <span id="propietarioVal" class="text-slate-200 font-medium"></span>
-        </div>
-        <div>
-          <span class="text-slate-500 block text-[9px] uppercase font-bold">Contacto Oficial</span>
-          <span id="telefonoVal" class="text-slate-200 font-medium"></span>
-        </div>
-        <div class="col-span-2">
-          <span class="text-slate-500 block text-[9px] uppercase font-bold">Ubicación Registrada</span>
-          <span id="direccionVal" class="text-slate-200 font-medium"></span>
-        </div>
-      </div>
-
-      <!-- MÓDULO DE VALIDACIÓN DE PIN DINÁMICO -->
-      <div class="bg-blue-950/30 border border-blue-500/40 p-3 rounded-xl space-y-2">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-bold text-blue-400 flex items-center gap-1">
-            🔑 Validador de PIN Dinámico
-          </span>
-          <span class="text-[9px] bg-blue-500/20 text-blue-300 font-mono px-2 py-0.5 rounded-full">Rotativo (30s)</span>
-        </div>
-        <p class="text-[10px] text-slate-400 leading-tight">
-          Ingresa el PIN de 6 dígitos publicado actualmente en la Historia o Estado de WhatsApp del comercio para confirmar autenticidad en tiempo real.
-        </p>
-        <div class="flex gap-2">
-          <input type="text" id="pinInput" placeholder="Ej: 564359" maxlength="6" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs font-mono text-center tracking-widest text-white focus:outline-none focus:border-blue-500">
-          <button id="verifyPinBtn" type="button" class="bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-xs font-bold px-3 py-1.5 rounded-lg text-white transition">Validar</button>
-        </div>
-        <div id="pinResult" class="hidden text-[10px] font-bold p-2 rounded-lg text-center"></div>
-      </div>
-
-      <!-- Pago Móvil Verificado -->
-      <div id="pagoMovilBox" class="bg-emerald-950/30 border border-emerald-500/40 p-3 rounded-xl space-y-2">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center gap-1.5 text-emerald-400 text-xs font-bold">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            Pago Móvil Autorizado
-          </div>
-          <span class="text-[9px] bg-emerald-500/20 text-emerald-300 font-mono px-2 py-0.5 rounded-full">Verificado</span>
-        </div>
-
-        <div class="grid grid-cols-3 gap-1 text-[11px] text-slate-300 font-mono bg-slate-950/80 p-2 rounded-lg border border-slate-800">
-          <div><span class="text-slate-500 block text-[9px]">BANCO</span><span id="pmBanco"></span></div>
-          <div><span class="text-slate-500 block text-[9px]">CI/RIF</span><span id="pmCedula"></span></div>
-          <div><span class="text-slate-500 block text-[9px]">TELÉFONO</span><span id="pmTelefono"></span></div>
-        </div>
-
-        <p class="text-[10px] text-amber-300/90 bg-amber-950/30 border border-amber-500/20 p-2 rounded-lg leading-tight font-medium">
-          ⚠️ <strong>ALERTA DE SEGURIDAD:</strong> Paga exclusivamente a los datos mostrados arriba. Si el vendedor te indica otro Pago Móvil, cancela la operación inmediatamente.
-        </p>
-
-        <!-- Validador de Datos de Pago -->
-        <div class="pt-1 border-t border-slate-800/80 space-y-1.5">
-          <label class="block text-[10px] text-slate-400 font-bold uppercase">Verificador de Coincidencia de Pago</label>
-          <div class="flex gap-1.5">
-            <input type="text" id="verifyPayInput" placeholder="Ingresa el tlf o C.I. que te dieron" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:outline-none focus:border-emerald-500 font-mono">
-            <button id="verifyPayBtn" type="button" class="bg-emerald-600 active:bg-emerald-700 text-[10px] font-bold px-3 py-1.5 rounded-lg text-white transition">Comprobar</button>
-          </div>
-          <p id="verifyPayResult" class="text-[10px] font-bold hidden"></p>
-        </div>
-      </div>
-
-      <!-- Botones de Acción -->
-      <div class="space-y-2 pt-1">
-        <button id="shareBtn" type="button" class="w-full bg-slate-800 active:bg-slate-700 text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-2 transition touch-manipulation">
-          Copiar Certificado Digital
+    <!-- Buscador de Comercios -->
+    <div class="space-y-2">
+      <div class="flex gap-2">
+        <input type="text" id="searchInput" placeholder="Buscar por ID (ej: bodega-jesus)..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-base text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition">
+        <button id="searchBtn" type="button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-5 py-3 rounded-xl text-base transition shrink-0">
+          Buscar
         </button>
-        <p id="copyMsg" class="text-[10px] text-emerald-400 text-center hidden font-bold">¡Enlace de verificación copiado!</p>
       </div>
+    </div>
+
+    <!-- Encabezado Shield -->
+    <div class="text-center space-y-2 border-b border-slate-800/80 pb-5">
+      <div class="inline-flex items-center gap-2 bg-blue-950/80 border border-blue-500/30 px-4 py-1.5 rounded-full mb-1">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-xs font-black tracking-widest text-blue-300 uppercase">VERIFIK SHIELD</span>
+      </div>
+      <h1 class="text-xl font-bold text-slate-200">Verificación Oficial de Identidad Comercial</h1>
+      <p id="liveTimestamp" class="text-sm text-slate-400 font-mono">Validado en Vivo: --</p>
+    </div>
+
+    <!-- Contenedor Principal del Comercio -->
+    <div id="merchantCard" class="space-y-6">
+
+      <!-- Badge de Nivel de Verificación -->
+      <div id="levelBadge" class="bg-emerald-950/40 border border-emerald-500/30 rounded-2xl p-4 text-center space-y-1">
+        <span id="levelTitle" class="text-base font-extrabold text-emerald-400 tracking-wide uppercase block">NIVEL 2 - COMERCIAL VERIFICADO</span>
+        <p id="levelDesc" class="text-sm text-slate-300">RIF, Pago Móvil y Ubicación Física Validados</p>
+        <div id="levelStars" class="text-yellow-400 text-base mt-1">⭐⭐</div>
+      </div>
+
+      <!-- Nombre del Comercio y RIF -->
+      <div class="text-center space-y-1">
+        <h2 id="merchantName" class="text-3xl font-black text-white tracking-tight">Cargando...</h2>
+        <p id="merchantRif" class="text-base font-mono text-slate-400">RIF: --</p>
+      </div>
+
+      <!-- Botón Instagram -->
+      <a id="instagramBtn" href="#" target="_blank" class="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 hover:opacity-90 text-white font-extrabold py-3.5 px-4 rounded-xl flex items-center justify-center gap-2 text-base shadow-lg transition">
+        <i class="fab fa-instagram text-xl"></i>
+        <span id="instagramText">Abrir Instagram Oficial</span>
+      </a>
+
+      <!-- Datos Propietario y Contacto -->
+      <div class="grid grid-cols-2 gap-4 bg-slate-950 border border-slate-800/80 rounded-2xl p-4 text-sm">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500 block">Propietario Legal</span>
+          <p id="ownerName" class="font-bold text-slate-100 text-base mt-0.5">--</p>
+        </div>
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500 block">Contacto Oficial</span>
+          <p id="ownerPhone" class="font-bold text-slate-100 text-base mt-0.5">--</p>
+        </div>
+        <div class="col-span-2 border-t border-slate-800/60 pt-3 mt-1">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500 block">Ubicación Registrada</span>
+          <p id="merchantAddress" class="font-bold text-slate-100 text-base mt-0.5">--</p>
+        </div>
+      </div>
+
+      <!-- Validador de PIN Dinámico -->
+      <div class="bg-slate-950 border border-blue-500/30 rounded-2xl p-5 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-bold text-blue-400 flex items-center gap-2">
+            <i class="fas fa-key"></i> Validador de PIN Dinámico
+          </span>
+          <span class="text-xs bg-blue-900/80 text-blue-300 font-bold px-2.5 py-1 rounded-full border border-blue-500/30">Rotativo (3 min)</span>
+        </div>
+        <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">Ingresa el PIN de 6 dígitos publicado actualmente en la Historia o Estado de WhatsApp del comercio para confirmar autenticidad en tiempo real.</p>
+        
+        <div class="flex gap-2">
+          <input type="text" id="pinInput" maxlength="6" placeholder="Ej: 123456" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 font-mono text-center text-xl tracking-widest text-emerald-400 focus:outline-none focus:border-emerald-500">
+          <button id="verifyPinBtn" type="button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-xl text-base transition">Validar</button>
+        </div>
+        
+        <div id="pinResult" class="text-sm font-bold text-center hidden py-2 rounded-lg"></div>
+      </div>
+
+      <!-- Bloque Pago Móvil Autorizado -->
+      <div class="bg-slate-950 border border-slate-800/80 rounded-2xl p-5 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-2">
+          <span class="text-sm font-bold text-emerald-400 flex items-center gap-2">
+            <i class="fas fa-shield-check"></i> Pago Móvil Autorizado
+          </span>
+          <span class="text-xs bg-emerald-950 text-emerald-400 font-semibold px-2.5 py-1 rounded-full border border-emerald-800/50">Verificado</span>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 text-xs sm:text-sm">
+          <div>
+            <span class="text-xs font-bold text-slate-500 uppercase block">Banco</span>
+            <p id="bankName" class="font-bold text-slate-100 text-base mt-0.5">--</p>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-slate-500 uppercase block">CI / RIF</span>
+            <p id="bankId" class="font-bold text-slate-100 text-base mt-0.5">--</p>
+          </div>
+          <div>
+            <span class="text-xs font-bold text-slate-500 uppercase block">Teléfono</span>
+            <p id="bankPhone" class="font-bold text-slate-100 text-base mt-0.5">--</p>
+          </div>
+        </div>
+
+        <!-- Alerta de Seguridad Pago Móvil -->
+        <div class="bg-amber-950/30 border border-amber-500/30 rounded-xl p-3.5 text-xs sm:text-sm text-amber-300 flex items-start gap-3">
+          <i class="fas fa-triangle-exclamation text-amber-400 text-lg shrink-0 mt-0.5"></i>
+          <p class="leading-relaxed">
+            <strong class="font-extrabold uppercase block text-xs text-amber-400">ALERTA DE SEGURIDAD:</strong>
+            Paga exclusivamente a los datos mostrados arriba. Si el vendedor te indica otro Pago Móvil, cancela la operación inmediatamente.
+          </p>
+        </div>
+
+        <!-- Verificador rápido de coincidencia de pago -->
+        <div class="pt-2 border-t border-slate-800/60 space-y-2">
+          <span class="text-xs font-bold text-slate-400 block">VERIFICADOR DE COINCIDENCIA DE PAGO</span>
+          <div class="flex gap-2">
+            <input type="text" id="checkPaymentInput" placeholder="Ingresa el tlf o C.I. que te dieron..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500">
+            <button id="checkPaymentBtn" type="button" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs sm:text-sm transition shrink-0">Comprobar</button>
+          </div>
+          <div id="checkPaymentResult" class="text-xs sm:text-sm font-bold hidden p-2.5 rounded-lg text-center"></div>
+        </div>
+      </div>
+
+      <!-- Botón Copiar Certificado -->
+      <button id="copyCertBtn" type="button" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-3.5 rounded-xl text-sm flex items-center justify-center gap-2 border border-slate-700 transition">
+        <i class="fas fa-link"></i> Copiar Certificado Digital
+      </button>
 
     </div>
 
-    <!-- No Encontrado -->
-    <div id="notFoundCard" class="hidden text-center py-6 border-t border-slate-800">
-      <p class="text-xs text-rose-400 font-bold">Comercio No Verificado o Inexistente</p>
-      <p class="text-[11px] text-slate-400 mt-1">Este comercio no cuenta con sello de seguridad activo en Verifik Shield.</p>
+    <!-- Estado No Encontrado -->
+    <div id="notFoundCard" class="hidden text-center py-8 space-y-3">
+      <i class="fas fa-store-slash text-4xl text-slate-600"></i>
+      <h3 class="text-lg font-bold text-slate-300">Comercio No Encontrado</h3>
+      <p class="text-sm text-slate-500">Verifica el ID ingresado o contacta al comercio para solicitar su enlace oficial.</p>
     </div>
 
   </div>
 
   <script>
-    const searchInput = document.getElementById('searchInput');
-    const searchBtn = document.getElementById('searchBtn');
-    const loading = document.getElementById('loading');
-    const merchantCard = document.getElementById('merchantCard');
-    const notFoundCard = document.getElementById('notFoundCard');
-    let currentMerchantData = null;
-
     function updateTimestamp() {
       const now = new Date();
-      document.getElementById('liveTimestamp').innerText = `Validado en Vivo: ${now.toLocaleDateString()} - ${now.toLocaleTimeString()}`;
+      document.getElementById('liveTimestamp').innerText = `Validado en Vivo: ${now.toLocaleDateString('es-VE')} - ${now.toLocaleTimeString('es-VE')}`;
     }
-    setInterval(updateTimestamp, 1000);
     updateTimestamp();
+    setInterval(updateTimestamp, 1000);
 
-    async function fetchMerchant(id) {
-      if (!id) return;
-      const cleanId = id.toString().trim().toLowerCase().replace(/\s+/g, '-');
-      if (!cleanId) return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const merchantId = urlParams.get('id') || 'bodega-jesus';
 
-      loading.classList.remove('hidden');
-      merchantCard.classList.add('hidden');
-      notFoundCard.classList.add('hidden');
-      document.getElementById('pinResult').classList.add('hidden');
-      document.getElementById('pinInput').value = '';
+    let currentMerchantData = null;
 
+    async function fetchMerchantData(id) {
       try {
-        const res = await fetch(`/api/merchants/${encodeURIComponent(cleanId)}`);
-        const result = await res.json();
+        const res = await fetch(`/api/merchants/${encodeURIComponent(id)}`);
+        const data = await res.json();
 
-        loading.classList.add('hidden');
-
-        if (!res.ok || !result.exito) {
-          notFoundCard.classList.remove('hidden');
-          return;
-        }
-
-        const data = result.comercio;
-        currentMerchantData = data;
-
-        document.getElementById('tiendaNombre').innerText = data.tienda || 'Comercio Registrado';
-        document.getElementById('tiendaRif').innerText = 'RIF: ' + (data.rif || 'N/A');
-        document.getElementById('propietarioVal').innerText = data.propietario || 'No especificado';
-        document.getElementById('telefonoVal').innerText = data.telefono || 'No especificado';
-        document.getElementById('direccionVal').innerText = data.direccion || 'Maturín, Monagas';
-
-        // Instagram
-        const instagramContainer = document.getElementById('instagramContainer');
-        const instagramBtn = document.getElementById('instagramBtn');
-        if (data.instagram) {
-          const cleanIg = data.instagram.replace('@', '').trim();
-          instagramBtn.href = `https://instagram.com/${cleanIg}`;
-          instagramBtn.innerHTML = `
-            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-            Abrir Instagram Oficial (@${cleanIg})
-          `;
-          instagramContainer.classList.remove('hidden');
+        if (res.ok && data.exito) {
+          currentMerchantData = data.comercio;
+          renderMerchant(data.comercio);
         } else {
-          instagramContainer.classList.add('hidden');
+          showNotFound();
         }
-
-        // Nivel de Verificación
-        const lvl = parseInt(data.nivel_verificacion) || 1;
-        const badgeContainer = document.getElementById('levelBadgeContainer');
-        const badgeText = document.getElementById('levelBadgeText');
-        const badgeDesc = document.getElementById('levelBadgeDesc');
-        const badgeIcon = document.getElementById('levelBadgeIcon');
-
-        if (lvl === 3) {
-          badgeContainer.className = "p-3 rounded-xl border border-amber-500/40 bg-amber-950/20";
-          badgeText.className = "text-xs font-black uppercase tracking-wider block text-amber-300";
-          badgeText.innerText = "Nivel 3 - Empresa Certificada";
-          badgeDesc.innerText = "Registro Mercantil y Auditoría Legal Completa";
-          badgeIcon.className = "w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-xs bg-amber-500 text-slate-950";
-          badgeIcon.innerText = "3★";
-        } else if (lvl === 2) {
-          badgeContainer.className = "p-3 rounded-xl border border-emerald-500/40 bg-emerald-950/20";
-          badgeText.className = "text-xs font-black uppercase tracking-wider block text-emerald-300";
-          badgeText.innerText = "Nivel 2 - Comercial Verificado";
-          badgeDesc.innerText = "RIF, Pago Móvil y Ubicación Física Validados";
-          badgeIcon.className = "w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-xs bg-emerald-500 text-slate-950";
-          badgeIcon.innerText = "2★";
-        } else {
-          badgeContainer.className = "p-3 rounded-xl border border-blue-500/40 bg-blue-950/20";
-          badgeText.className = "text-xs font-black uppercase tracking-wider block text-blue-300";
-          badgeText.innerText = "Nivel 1 - Identidad Básica";
-          badgeDesc.innerText = "Teléfono y Cédula/RIF Verificado";
-          badgeIcon.className = "w-8 h-8 rounded-full flex items-center justify-center font-extrabold text-xs bg-blue-500 text-slate-950";
-          badgeIcon.innerText = "1★";
-        }
-
-        // Pago Móvil
-        if (data.banco_pago_movil && data.cedula_pago_movil) {
-          document.getElementById('pagoMovilBox').classList.remove('hidden');
-          document.getElementById('pmBanco').innerText = data.banco_pago_movil;
-          document.getElementById('pmCedula').innerText = data.cedula_pago_movil;
-          document.getElementById('pmTelefono').innerText = data.telefono_pago_movil || data.telefono;
-        } else {
-          document.getElementById('pagoMovilBox').classList.add('hidden');
-        }
-
-        merchantCard.classList.remove('hidden');
       } catch (err) {
-        loading.classList.add('hidden');
-        notFoundCard.classList.remove('hidden');
+        showNotFound();
       }
     }
 
-    // Validador de PIN Dinámico
+    function renderMerchant(c) {
+      document.getElementById('merchantCard').classList.remove('hidden');
+      document.getElementById('notFoundCard').classList.add('hidden');
+
+      document.getElementById('merchantName').innerText = c.tienda || 'Comercio Sin Nombre';
+      document.getElementById('merchantRif').innerText = `RIF: ${c.rif || 'N/A'}`;
+      document.getElementById('ownerName').innerText = c.propietario || 'No especificado';
+      document.getElementById('ownerPhone').innerText = c.telefono || 'No especificado';
+      document.getElementById('merchantAddress').innerText = c.direccion || 'No registrada';
+
+      const lvl = c.nivel_verificacion || 1;
+      const levelBadge = document.getElementById('levelBadge');
+      const levelTitle = document.getElementById('levelTitle');
+      const levelDesc = document.getElementById('levelDesc');
+      const levelStars = document.getElementById('levelStars');
+
+      if (lvl >= 2) {
+        levelBadge.className = "bg-emerald-950/40 border border-emerald-500/30 rounded-2xl p-4 text-center space-y-1";
+        levelTitle.className = "text-base font-extrabold text-emerald-400 tracking-wide uppercase block";
+        levelTitle.innerText = "NIVEL 2 - COMERCIAL VERIFICADO";
+        levelDesc.innerText = "RIF, Pago Móvil y Ubicación Física Validados";
+        levelStars.innerText = "⭐⭐";
+      } else {
+        levelBadge.className = "bg-blue-950/40 border border-blue-500/30 rounded-2xl p-4 text-center space-y-1";
+        levelTitle.className = "text-base font-extrabold text-blue-400 tracking-wide uppercase block";
+        levelTitle.innerText = "NIVEL 1 - REGISTRO BÁSICO";
+        levelDesc.innerText = "Identidad Básica Registrada";
+        levelStars.innerText = "⭐";
+      }
+
+      const instagramBtn = document.getElementById('instagramBtn');
+      if (c.instagram) {
+        const handle = c.instagram.replace('@', '').trim();
+        instagramBtn.href = `https://instagram.com/${handle}`;
+        document.getElementById('instagramText').innerText = `Abrir Instagram Oficial (@${handle})`;
+        instagramBtn.classList.remove('hidden');
+      } else {
+        instagramBtn.classList.add('hidden');
+      }
+
+      document.getElementById('bankName').innerText = c.banco_pago_movil || 'N/A';
+      document.getElementById('bankId').innerText = c.cedula_pago_movil || 'N/A';
+      document.getElementById('bankPhone').innerText = c.telefono_pago_movil || 'N/A';
+    }
+
+    function showNotFound() {
+      document.getElementById('merchantCard').classList.add('hidden');
+      document.getElementById('notFoundCard').classList.remove('hidden');
+    }
+
+    document.getElementById('searchBtn').addEventListener('click', () => {
+      const q = document.getElementById('searchInput').value.trim();
+      if (q) fetchMerchantData(q);
+    });
+
     document.getElementById('verifyPinBtn').addEventListener('click', async () => {
-      const pinVal = document.getElementById('pinInput').value.trim();
-      const resultEl = document.getElementById('pinResult');
-      const merchantId = searchInput.value.trim().toLowerCase().replace(/\s+/g, '-');
+      const userPin = document.getElementById('pinInput').value.trim();
+      const resultDiv = document.getElementById('pinResult');
 
-      if (!pinVal || !merchantId) return;
-
-      resultEl.classList.remove('hidden');
-      resultEl.className = "text-[10px] font-bold p-2 rounded-lg text-center bg-slate-800 text-slate-300 animate-pulse";
-      resultEl.innerText = "Validando PIN con el servidor...";
+      if (!userPin || userPin.length !== 6) {
+        resultDiv.className = "text-sm font-bold text-center py-2 px-3 rounded-lg bg-amber-950/60 text-amber-300 border border-amber-500/30";
+        resultDiv.innerText = "⚠️ Ingresa un PIN válido de 6 dígitos";
+        resultDiv.classList.remove('hidden');
+        return;
+      }
 
       try {
         const res = await fetch(`/api/merchants/${encodeURIComponent(merchantId)}/verify-token`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userPin: pinVal })
+          body: JSON.stringify({ userPin })
         });
         const data = await res.json();
 
+        resultDiv.classList.remove('hidden');
         if (res.ok && data.valido) {
-          resultEl.className = "text-[10px] font-bold p-2 rounded-lg text-center bg-emerald-500/20 text-emerald-300 border border-emerald-500/40";
-          resultEl.innerText = data.mensaje;
+          resultDiv.className = "text-sm font-bold text-center py-2.5 px-3 rounded-lg bg-emerald-950/80 text-emerald-300 border border-emerald-500/40";
+          resultDiv.innerText = "🟢 PIN Dinámico Correcto - Verificación en Tiempo Real Exitosa";
         } else {
-          resultEl.className = "text-[10px] font-bold p-2 rounded-lg text-center bg-rose-500/20 text-rose-300 border border-rose-500/40";
-          resultEl.innerText = data.mensaje || "❌ PIN Expirado o Incorrecto";
+          resultDiv.className = "text-sm font-bold text-center py-2.5 px-3 rounded-lg bg-rose-950/80 text-rose-300 border border-rose-500/40";
+          resultDiv.innerText = "❌ PIN Expirado o Inválido. Consulta la Historia o Estado actual del comercio.";
         }
       } catch (err) {
-        resultEl.className = "text-[10px] font-bold p-2 rounded-lg text-center bg-rose-500/20 text-rose-300 border border-rose-500/40";
-        resultEl.innerText = "Error al conectar con la API de validación";
+        resultDiv.className = "text-sm font-bold text-center py-2.5 px-3 rounded-lg bg-rose-950/80 text-rose-300 border border-rose-500/40";
+        resultDiv.innerText = "Error al conectar con el servidor.";
+        resultDiv.classList.remove('hidden');
       }
     });
 
-    // Validador de Datos de Pago Móvil
-    document.getElementById('verifyPayBtn').addEventListener('click', () => {
-      const inputVal = document.getElementById('verifyPayInput').value.replace(/[^0-9]/g, '');
-      const resultEl = document.getElementById('verifyPayResult');
-      
+    document.getElementById('checkPaymentBtn').addEventListener('click', () => {
+      const inputVal = document.getElementById('checkPaymentInput').value.trim().toLowerCase();
+      const resDiv = document.getElementById('checkPaymentResult');
+
       if (!inputVal || !currentMerchantData) return;
 
-      const registeredPhone = (currentMerchantData.telefono_pago_movil || currentMerchantData.telefono || '').replace(/[^0-9]/g, '');
-      const registeredId = (currentMerchantData.cedula_pago_movil || '').replace(/[^0-9]/g, '');
+      const bankPhone = (currentMerchantData.telefono_pago_movil || '').toLowerCase();
+      const bankId = (currentMerchantData.cedula_pago_movil || '').toLowerCase();
 
-      resultEl.classList.remove('hidden');
-
-      if ((registeredPhone && registeredPhone.includes(inputVal)) || (registeredId && registeredId.includes(inputVal))) {
-        resultEl.className = "text-[10px] font-bold text-emerald-400 mt-1";
-        resultEl.innerText = "✅ COINCIDENCIA CONFIRMADA: Este dato pertenece al Pago Móvil oficial.";
+      resDiv.classList.remove('hidden');
+      if (inputVal.includes(bankPhone) || inputVal.includes(bankId) || bankPhone.includes(inputVal) || bankId.includes(inputVal)) {
+        resDiv.className = "text-sm font-bold p-2.5 rounded-lg text-center bg-emerald-950/80 text-emerald-300 border border-emerald-500/30";
+        resDiv.innerText = "✅ LOS DATOS COINCIDEN CON EL PAGO MÓVIL REGISTRADO";
       } else {
-        resultEl.className = "text-[10px] font-bold text-rose-400 mt-1";
-        resultEl.innerText = "❌ ALERTA ROJA: El dato ingresado NO coincide con el Pago Móvil autorizado. Posible estafa.";
+        resDiv.className = "text-sm font-bold p-2.5 rounded-lg text-center bg-rose-950/80 text-rose-300 border border-rose-500/30";
+        resDiv.innerText = "⚠️ CUIDADO: LOS DATOS NO COINCIDEN CON EL PAGO MÓVIL REGISTRADO";
       }
     });
 
-    const executeSearch = () => fetchMerchant(searchInput.value);
-    searchBtn.addEventListener('click', executeSearch);
-    searchInput.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') { searchInput.blur(); executeSearch(); }
+    document.getElementById('copyCertBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(window.location.href);
+      alert('¡Enlace del Certificado Digital copiado al portapapeles!');
     });
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const idFromUrl = urlParams.get('id');
-      if (idFromUrl) {
-        searchInput.value = idFromUrl.trim();
-        fetchMerchant(idFromUrl);
-      }
-    });
-
-    document.getElementById('shareBtn').addEventListener('click', async () => {
-      const currentId = searchInput.value.trim().toLowerCase().replace(/\s+/g, '-');
-      const shareUrl = `${window.location.origin}/verify?id=${currentId}`;
-      try {
-        if (navigator.clipboard && window.isSecureContext) {
-          await navigator.clipboard.writeText(shareUrl);
-        } else {
-          const textArea = document.createElement("textarea");
-          textArea.value = shareUrl;
-          document.body.appendChild(textArea);
-          textArea.select();
-          document.execCommand('copy');
-          document.body.removeChild(textArea);
-        }
-        const copyMsg = document.getElementById('copyMsg');
-        copyMsg.classList.remove('hidden');
-        setTimeout(() => copyMsg.classList.add('hidden'), 3000);
-      } catch (err) {}
-    });
+    fetchMerchantData(merchantId);
   </script>
 
 </body>

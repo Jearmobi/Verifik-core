@@ -5,13 +5,14 @@ const https = require('https');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-const SUPABASE_HOST = process.env.SUPABASE_HOST || 'yvdexfuyqmsdxfkndoxg.supabase.co';
+// Host de Supabase corregido
+const SUPABASE_HOST = process.env.SUPABASE_HOST || 'rwovvnzlaqiqrmngitxo.supabase.co';
 const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Servir vistas HTML
+// Servir vistas HTML sin extensión
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'verify.html')));
 app.get('/verify', (req, res) => res.sendFile(path.join(__dirname, 'public', 'verify.html')));
 app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
@@ -83,7 +84,7 @@ app.get('/api/merchants', (req, res) => {
   request.end();
 });
 
-// API: Registrar nuevo comercio (con secret y nivel automático)
+// API: Registrar nuevo comercio
 app.post(['/api/register', '/api/merchants/register'], (req, res) => {
   try {
     const {

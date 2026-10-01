@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verifik Shield - Seguridad y Verificación Comercial para tu Negocio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased">
+
+  <!-- Navegación -->
+  <nav class="border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="font-black text-lg tracking-wider text-blue-400">VERIFIK SHIELD</span>
+      </div>
+      <div class="hidden md:flex items-center gap-8 text-sm text-slate-300">
+        <a href="#beneficios" class="hover:text-white transition">Beneficios</a>
+        <a href="#planes" class="hover:text-white transition">Planes</a>
+        <a href="#como-funciona" class="hover:text-white transition">¿Cómo funciona?</a>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="/register" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2 rounded-xl text-sm transition">
+          Registrar Comercio
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="py-16 sm:py-24 px-4 text-center relative overflow-hidden">
+    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-3xl -z-10"></div>
+    <div class="max-w-4xl mx-auto space-y-6">
+      <div class="inline-flex items-center gap-2 bg-blue-950/80 border border-blue-500/30 px-4 py-1.5 rounded-full">
+        <i class="fas fa-shield-alt text-blue-400 text-xs"></i>
+        <span class="text-xs font-bold text-blue-300 tracking-wide uppercase">La Plataforma Antifraude para Comercios</span>
+      </div>
+      <h1 class="text-3xl sm:text-6xl font-black text-white tracking-tight leading-tight">
+        Elimina la desconfianza y <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-emerald-400">cierra más ventas</span>
+      </h1>
+      <p class="text-base sm:text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
+        Certifica tu identidad comercial, protege a tus clientes de suplantaciones y valida tus pagos móviles con nuestro sistema de PIN dinámico rotativo.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+        <a href="/register" class="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-emerald-600 hover:opacity-90 text-white font-extrabold px-8 py-4 rounded-2xl text-base shadow-lg transition">
+          Crear Certificado Gratis
+        </a>
+        <a href="/verify?id=bodega-jesus" target="_blank" class="w-full sm:w-auto bg-slate-900 border border-slate-700 hover:bg-slate-800 text-slate-200 font-bold px-8 py-4 rounded-2xl text-base transition">
+          Ver Demo en Vivo
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección de Tarifas / Planes -->
+  <section id="planes" class="py-16 bg-slate-900/50 border-y border-slate-800/80 px-4">
+    <div class="max-w-6xl mx-auto space-y-12">
+      <div class="text-center space-y-3">
+        <h2 class="text-2xl sm:text-4xl font-extrabold text-white">Planes diseñados para tu negocio</h2>
+        <p class="text-slate-400 text-sm sm:text-base">Empieza gratis y escala a medida que aumenten tus ventas.</p>
+        
+        <!-- Toggle Mensual / Anual -->
+        <div class="flex items-center justify-center gap-3 pt-4">
+          <span id="labelMensual" class="text-sm font-bold text-white">Facturación Mensual</span>
+          <button id="toggleBilling" class="w-14 h-8 bg-blue-600 rounded-full p-1 transition relative">
+            <div id="toggleCircle" class="w-6 h-6 bg-white rounded-full transition transform translate-x-0"></div>
+          </button>
+          <span id="labelAnual" class="text-sm font-bold text-slate-400 flex items-center gap-1.5">
+            Facturación Anual <span class="bg-emerald-950 text-emerald-400 border border-emerald-500/30 text-[10px] px-2 py-0.5 rounded-full uppercase">Ahorra 20%</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Tarjetas de Planes -->
+      <div class="grid md:grid-cols-3 gap-8 items-stretch">
+        
+        <!-- Plan Gratuito -->
+        <div class="bg-slate-950 border border-slate-800 rounded-3xl p-6 sm:p-8 flex flex-col justify-between space-y-6">
+          <div class="space-y-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400 block">Básico / Emprendedor</span>
+            <h3 class="text-2xl font-black text-white">Plan Gratuito</h3>
+            <div class="flex items-baseline gap-1">
+              <span class="text-4xl font-black text-white">$0</span>
+              <span class="text-slate-400 text-sm">/ de por vida</span>
+            </div>
+            <p class="text-xs text-slate-400 border-b border-slate-800 pb-4">Ideal para emprendimientos pequeños que están iniciando.</p>
+            
+            <ul class="space-y-3 text-xs sm:text-sm text-slate-300">
+              <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Hasta 50 consultas de clientes/mes</li>
+              <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Verificación Nivel 1 (RIF y Cédula)</li>
+              <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> 1 Cuenta de Pago Móvil registrada</li>
+              <li class="flex items-center gap-2 text-slate-500"><i class="fas fa-times"></i> Validador de PIN Dinámico (3 min)</li>
+            </ul>
+          </div>
+          <a href="/register" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3.5 rounded-xl text-center text-sm transition">Comenzar Gratis</a>
+        </div>
+
+        <!-- Plan PRO (Destacado) -->
+        <div class="bg-slate-900 border-2 border-blue-500 rounded-3xl p-6 sm:p-8 flex flex-col justify-between space-y-6 relative shadow-2xl shadow-blue-500/10">
+          <div class="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-blue-600 to-emerald-600 text-white font-black text-[10px] uppercase tracking-wider px-4 py-1 rounded-full">
+            MÁS POPULAR
+          </div>
+          <div class="space-y-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-blue-400 block">Comercio Activo</span>
+            <h3 class="text-2xl font-black text-white">Plan PRO</h3>
+            <div class="flex items-baseline gap-1">
+              <span id="pricePro" class="text-4xl font-black text-white">$8</span>
+              <span id="periodPro" class="text-slate-400 text-sm">/ mes</span>
+            </div>
+            <p class="text-xs text-slate-400 border-b border-slate-800 pb-4">Para tiendas físicas e Instagramers con flujo diario de ventas.</p>
+            
+            <ul class="space-y-3 text-xs sm:text-sm text-slate-200">
+              <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> <strong>Consultas Ilimitadas</strong></li>
+              <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Verificación Nivel 2 (Física y Comercial)</li>
+              <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> <strong>Validador de PIN Dinámico (3 min)</strong></li>
+              <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Hasta 3 Cuentas de Pago Móvil</li>
+              <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Alertas antifraude y coincidencia</li>
+            </ul>
+          </div>
+          <a href="/register?plan=pro" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 rounded-xl text-center text-sm transition shadow-lg">Obtener Plan PRO</a>
+        </div>
+
+        <!-- Plan Enterprise -->
+        <div class="bg-slate-950 border border-slate-800 rounded-3xl p-6 sm:p-8 flex flex-col justify-between space-y-6">
+          <div class="space-y-4">
+            <span class="text-xs font-bold uppercase tracking-wider text-purple-400 block">Corporativo / Automatización</span>
+            <h3 class="text-2xl font-black text-white">Enterprise</h3>
+            <div class="flex items-baseline gap-1">
+              <span id="priceEnt" class="text-4xl font-black text-white">$25</span>
+              <span id="periodEnt" class="text-slate-400 text-sm">/ mes</span>
+            </div>
+            <p class="text-xs text-slate-400 border-b border-slate-800 pb-4">Integración con bots de WhatsApp, WooCommerce y multicuentas.</p>
+            
+            <ul class="space-y-3 text-xs sm:text-sm text-slate-300">
+              <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Todo lo del Plan PRO</li>
+              <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> API Key para integración con WhatsApp Bots</li>
+              <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Cuentas de Pago Móvil Ilimitadas</li>
+              <li class="flex items-center gap-2"><i class="fas fa-check text-emerald-400"></i> Asesoría de Seguridad VIP</li>
+            </ul>
+          </div>
+          <a href="https://wa.me/584128425733?text=Hola,%20me%20interesa%20el%20Plan%20Enterprise" target="_blank" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-3.5 rounded-xl text-center text-sm transition">Contactar Ventas</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Lógica Interactiva Toggle Precios -->
+  <script>
+    let isAnnual = false;
+    const toggleBtn = document.getElementById('toggleBilling');
+    const toggleCircle = document.getElementById('toggleCircle');
+    const labelMensual = document.getElementById('labelMensual');
+    const labelAnual = document.getElementById('labelAnual');
+
+    const pricePro = document.getElementById('pricePro');
+    const periodPro = document.getElementById('periodPro');
+    const priceEnt = document.getElementById('priceEnt');
+    const periodEnt = document.getElementById('periodEnt');
+
+    toggleBtn.addEventListener('click', () => {
+      isAnnual = !isAnnual;
+      if (isAnnual) {
+        toggleCircle.classList.add('translate-x-6');
+        toggleBtn.classList.replace('bg-blue-600', 'bg-emerald-600');
+        labelMensual.classList.replace('text-white', 'text-slate-400');
+        labelAnual.classList.replace('text-slate-400', 'text-white');
+
+        pricePro.innerText = '$80';
+        periodPro.innerText = '/ año ($6.6/mes)';
+        priceEnt.innerText = '$240';
+        periodEnt.innerText = '/ año ($20/mes)';
+      } else {
+        toggleCircle.classList.remove('translate-x-6');
+        toggleBtn.classList.replace('bg-emerald-600', 'bg-blue-600');
+        labelAnual.classList.replace('text-white', 'text-slate-400');
+        labelMensual.classList.replace('text-slate-400', 'text-white');
+
+        pricePro.innerText = '$8';
+        periodPro.innerText = '/ mes';
+        priceEnt.innerText = '$25';
+        periodEnt.innerText = '/ mes';
+      }
+    });
+  </script>
+
+</body>
+</html>

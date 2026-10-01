@@ -31,7 +31,7 @@ const noCache = (req, res, next) => {
 };
 
 // Rutas estáticas
-app.get('/', noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'verify.html')));
+app.get('/', noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 app.get('/verify', noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'verify.html')));
 app.get('/register', noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
 app.get('/admin', noCache, (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));

@@ -10,15 +10,15 @@
 
   <div class="max-w-md w-full bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-2xl space-y-5 relative">
     
-    <!-- Encabezado -->
+    <!-- Encabezado con Indicador en Vivo -->
     <div class="text-center border-b border-slate-800 pb-3">
       <div class="inline-flex items-center gap-2 bg-blue-950/60 border border-blue-500/30 px-3 py-1 rounded-full mb-1">
-        <svg class="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-        </svg>
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
         <span class="text-xs font-bold tracking-wider text-blue-300 uppercase">Verifik Shield</span>
       </div>
       <p class="text-[11px] text-slate-400">Verificación Oficial de Identidad Comercial</p>
+      <!-- Anti-Captura: Reloj en Vivo -->
+      <p id="liveTimestamp" class="text-[9px] font-mono text-emerald-400/80 mt-1"></p>
     </div>
 
     <!-- Buscador Móvil -->
@@ -60,6 +60,14 @@
         <p id="tiendaRif" class="text-xs font-mono text-slate-400"></p>
       </div>
 
+      <!-- Red Social Oficial (Anti-Phishing) -->
+      <div id="instagramContainer" class="hidden">
+        <a id="instagramBtn" href="#" target="_blank" rel="noopener noreferrer" class="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 text-white font-bold py-2 px-3 rounded-xl text-xs flex items-center justify-center gap-2 shadow-lg hover:opacity-95 transition">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+          Abrir Instagram Oficial Registrado
+        </a>
+      </div>
+
       <!-- Datos Validados -->
       <div class="grid grid-cols-2 gap-2 text-xs bg-slate-950/70 p-3 rounded-xl border border-slate-800/80">
         <div>
@@ -76,16 +84,34 @@
         </div>
       </div>
 
-      <!-- Pago Móvil Verificado -->
-      <div id="pagoMovilBox" class="bg-emerald-950/30 border border-emerald-500/30 p-3 rounded-xl space-y-1">
-        <div class="flex items-center gap-1.5 text-emerald-400 text-xs font-bold">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          Pago Móvil Autorizado
+      <!-- Pago Móvil Verificado con Alerta de Seguridad -->
+      <div id="pagoMovilBox" class="bg-emerald-950/30 border border-emerald-500/40 p-3 rounded-xl space-y-2">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-1.5 text-emerald-400 text-xs font-bold">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            Pago Móvil Autorizado
+          </div>
+          <span class="text-[9px] bg-emerald-500/20 text-emerald-300 font-mono px-2 py-0.5 rounded-full">Verificado</span>
         </div>
-        <div class="grid grid-cols-3 gap-1 text-[11px] text-slate-300 font-mono pt-1">
+
+        <div class="grid grid-cols-3 gap-1 text-[11px] text-slate-300 font-mono bg-slate-950/80 p-2 rounded-lg border border-slate-800">
           <div><span class="text-slate-500 block text-[9px]">BANCO</span><span id="pmBanco"></span></div>
           <div><span class="text-slate-500 block text-[9px]">CI/RIF</span><span id="pmCedula"></span></div>
           <div><span class="text-slate-500 block text-[9px]">TELÉFONO</span><span id="pmTelefono"></span></div>
+        </div>
+
+        <p class="text-[10px] text-amber-300/90 bg-amber-950/30 border border-amber-500/20 p-2 rounded-lg leading-tight font-medium">
+          ⚠️ <strong>ALERTA DE SEGURIDAD:</strong> Paga exclusivamente a los datos mostrados arriba. Si el vendedor te indica otro Pago Móvil, cancela la operación inmediatamente.
+        </p>
+
+        <!-- Validador Dinámico en Tiempo Real -->
+        <div class="pt-1 border-t border-slate-800/80 space-y-1.5">
+          <label class="block text-[10px] text-slate-400 font-bold uppercase">Verificador de Coincidencia de Pago</label>
+          <div class="flex gap-1.5">
+            <input type="text" id="verifyPayInput" placeholder="Ingresa el tlf o C.I. que te dieron" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-[11px] text-white focus:outline-none focus:border-emerald-500 font-mono">
+            <button id="verifyPayBtn" type="button" class="bg-emerald-600 active:bg-emerald-700 text-[10px] font-bold px-3 py-1.5 rounded-lg text-white transition">Comprobar</button>
+          </div>
+          <p id="verifyPayResult" class="text-[10px] font-bold hidden"></p>
         </div>
       </div>
 
@@ -117,6 +143,15 @@
     const loading = document.getElementById('loading');
     const merchantCard = document.getElementById('merchantCard');
     const notFoundCard = document.getElementById('notFoundCard');
+    let currentMerchantData = null;
+
+    // Actualizador de Reloj Anti-Captura de Pantalla
+    function updateTimestamp() {
+      const now = new Date();
+      document.getElementById('liveTimestamp').innerText = `Validado en Vivo: ${now.toLocaleDateString()} - ${now.toLocaleTimeString()}`;
+    }
+    setInterval(updateTimestamp, 1000);
+    updateTimestamp();
 
     async function fetchMerchant(id) {
       if (!id) return;
@@ -139,12 +174,28 @@
         }
 
         const data = result.comercio;
+        currentMerchantData = data;
 
         document.getElementById('tiendaNombre').innerText = data.tienda || 'Comercio Registrado';
         document.getElementById('tiendaRif').innerText = 'RIF: ' + (data.rif || 'N/A');
         document.getElementById('propietarioVal').innerText = data.propietario || 'No especificado';
         document.getElementById('telefonoVal').innerText = data.telefono || 'No especificado';
         document.getElementById('direccionVal').innerText = data.direccion || 'Maturín, Monagas';
+
+        // Red Social Oficial (Instagram)
+        const instagramContainer = document.getElementById('instagramContainer');
+        const instagramBtn = document.getElementById('instagramBtn');
+        if (data.instagram) {
+          const cleanIg = data.instagram.replace('@', '').trim();
+          instagramBtn.href = `https://instagram.com/${cleanIg}`;
+          instagramBtn.innerHTML = `
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            Abrir Instagram Oficial (@${cleanIg})
+          `;
+          instagramContainer.classList.remove('hidden');
+        } else {
+          instagramContainer.classList.add('hidden');
+        }
 
         // Renderizar Nivel de Verificación
         const lvl = parseInt(data.nivel_verificacion) || 1;
@@ -192,6 +243,27 @@
         notFoundCard.classList.remove('hidden');
       }
     }
+
+    // Lógica del Validador Dinámico de Pago Móvil
+    document.getElementById('verifyPayBtn').addEventListener('click', () => {
+      const inputVal = document.getElementById('verifyPayInput').value.replace(/[^0-9]/g, '');
+      const resultEl = document.getElementById('verifyPayResult');
+      
+      if (!inputVal || !currentMerchantData) return;
+
+      const registeredPhone = (currentMerchantData.telefono_pago_movil || currentMerchantData.telefono || '').replace(/[^0-9]/g, '');
+      const registeredId = (currentMerchantData.cedula_pago_movil || '').replace(/[^0-9]/g, '');
+
+      resultEl.classList.remove('hidden');
+
+      if ((registeredPhone && registeredPhone.includes(inputVal)) || (registeredId && registeredId.includes(inputVal))) {
+        resultEl.className = "text-[10px] font-bold text-emerald-400 mt-1";
+        resultEl.innerText = "✅ COINCIDENCIA CONFIRMADA: Este dato pertenece al Pago Móvil oficial.";
+      } else {
+        resultEl.className = "text-[10px] font-bold text-rose-400 mt-1";
+        resultEl.innerText = "❌ ALERTA ROJA: El dato ingresado NO coincide con el Pago Móvil autorizado. Posible estafa.";
+      }
+    });
 
     const executeSearch = () => fetchMerchant(searchInput.value);
     searchBtn.addEventListener('click', executeSearch);

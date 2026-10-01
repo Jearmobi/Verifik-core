@@ -11,15 +11,16 @@ const SUPABASE_KEY = process.env.SUPABASE_KEY || '';
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Vistas HTML
+// Rutas para servir archivos HTML sin extensión
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'verify.html')));
 app.get('/verify', (req, res) => res.sendFile(path.join(__dirname, 'public', 'verify.html')));
 app.get('/register', (req, res) => res.sendFile(path.join(__dirname, 'public', 'register.html')));
 app.get('/admin', (req, res) => res.sendFile(path.join(__dirname, 'public', 'admin.html')));
+app.get('/client-verify', (req, res) => res.sendFile(path.join(__dirname, 'public', 'client-verify.html')));
 
-// API: Obtener comercio por ID
+// API: Obtener un comercio por su ID
 app.get('/api/merchants/:id', (req, res) => {
-  const merchantId = req.params.id.toLowerCase().trim().replace(/\s+/g, '-');
+  const merchantId = req.params.id.toLowerCase().trim();
 
   const options = {
     hostname: SUPABASE_HOST,
@@ -38,7 +39,7 @@ app.get('/api/merchants/:id', (req, res) => {
     response.on('end', () => {
       try {
         const parsed = JSON.parse(data);
-        if (response.statusCode === 200 && parsed.length > 0) {
+        if (response.statusCode === 200 && Array.isArray(parsed) && parsed.length > 0) {
           res.status(200).json({ exito: true, comercio: parsed[0] });
         } else {
           res.status(404).json({ exito: false, mensaje: 'Comercio no encontrado' });
@@ -82,7 +83,7 @@ app.get('/api/merchants', (req, res) => {
   request.end();
 });
 
-// API: Registrar nuevo comercio
+// API: Registrar nuevo comercio (con nivel automático)
 app.post(['/api/register', '/api/merchants/register'], (req, res) => {
   try {
     const {
@@ -91,12 +92,17 @@ app.post(['/api/register', '/api/merchants/register'], (req, res) => {
     } = req.body;
 
     let nivelCalculado = 1;
-    if (banco_pago_movil && cedula_pago_movil && telefono_pago_movil && instagram && direccion) {
+    const tienePagoMovil = banco_pago_movil && cedula_pago_movil && telefono_pago_movil;
+    const tieneRedesYDireccion = instagram && direccion;
+
+    if (tienePagoMovil && tieneRedesYDireccion) {
       nivelCalculado = 2;
     }
 
+    const cleanId = id ? id.toLowerCase().trim().replace(/\s+/g, '-') : '';
+
     const payload = JSON.stringify([{
-      id: id ? id.toLowerCase().trim().replace(/\s+/g, '-') : '',
+      id: cleanId,
       tienda,
       rif,
       color_marca: colorMarca || '#0284c7',
@@ -146,35 +152,43 @@ app.post(['/api/register', '/api/merchants/register'], (req, res) => {
   }
 });
 
-// API: Actualizar comercio desde el Panel Admin
+// API: Actualizar datos de un comercio desde el Panel Admin
 app.patch('/api/merchants/:id', (req, res) => {
-  const merchantId = req.params.id;
-  const payload = JSON.stringify(req.body);
+  try {
+    const merchantId = req.params.id.toLowerCase().trim();
+    const payload = JSON.stringify(req.body);
 
-  const options = {
-    hostname: SUPABASE_HOST,
-    port: 443,
-    path: `/rest/v1/merchants?id=eq.${encodeURIComponent(merchantId)}`,
-    method: 'PATCH',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': SUPABASE_KEY,
-      'Authorization': `Bearer ${SUPABASE_KEY}`,
-      'Prefer': 'return=representation'
-    }
-  };
+    const options = {
+      hostname: SUPABASE_HOST,
+      port: 443,
+      path: `/rest/v1/merchants?id=eq.${encodeURIComponent(merchantId)}`,
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Prefer': 'return=representation'
+      }
+    };
 
-  const request = https.request(options, (response) => {
-    let data = '';
-    response.on('data', (chunk) => data += chunk);
-    response.on('end', () => {
-      res.status(response.statusCode).json({ success: response.statusCode < 300, data });
+    const request = https.request(options, (response) => {
+      let data = '';
+      response.on('data', (chunk) => data += chunk);
+      response.on('end', () => {
+        if (response.statusCode >= 200 && response.statusCode < 300) {
+          res.status(200).json({ success: true, data: data ? JSON.parse(data) : {} });
+        } else {
+          res.status(response.statusCode).json({ success: false, error: data });
+        }
+      });
     });
-  });
 
-  request.on('error', (e) => res.status(500).json({ success: false, error: e.message }));
-  request.write(payload);
-  request.end();
+    request.on('error', (e) => res.status(500).json({ success: false, error: e.message }));
+    request.write(payload);
+    request.end();
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
 });
 
 app.listen(PORT, () => {

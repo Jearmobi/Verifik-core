@@ -1,0 +1,288 @@
+﻿{
+  "name": "Verifik Shield Core Flow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "whatsapp-incoming",
+        "options": {}
+      },
+      "id": "node-webhook",
+      "name": "Webhook WhatsApp",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body || {};\nlet messageText = '';\nlet senderPhone = '';\n\nif (body.entry && body.entry[0]?.changes && body.entry[0].changes[0]?.value?.messages) {\n  const messageObj = body.entry[0].changes[0].value.messages[0];\n  messageText = messageObj.text?.body || '';\n  senderPhone = messageObj.from || '';\n} else {\n  messageText = body.message || body.text || 'Hola';\n  senderPhone = body.phone || body.from || 'test_user';\n}\n\nreturn { text: messageText, phone: senderPhone };"
+      },
+      "id": "node-extract-data",
+      "name": "Extraer Datos",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [420, 300]
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash",
+        "messages": {
+          "values": [
+            {
+              "role": "user",
+              "content": "=Actúa como clasificador del sistema Verifik Shield.\nTexto del usuario: \"{{ $json.text }}\"\n\nResponde ÚNICAMENTE un objeto JSON puro (sin bloques ```json):\n{\n  \"intencion\": \"verificar\" | \"recomendar\" | \"otro\",\n  \"termino_busqueda\": \"nombre, RIF o instagram si busca verificar un comercio, sino null\",\n  \"categoria\": \"categoría si busca recomendaciones (ej: Supermercado, Repuestos, General), sino null\"\n}"
+            }
+          ]
+        }
+      },
+      "id": "node-gemini",
+      "name": "Gemini Clasificador",
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1,
+      "position": [640, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "let raw = $json.text \vert{}\vert{}$json.output || '{}';\nraw = raw.replace(/```json/g, '').replace(/```/g, '').trim();\nlet parsed = {};\ntry {\n  parsed = JSON.parse(raw);\n} catch (e) {\n  parsed = { intencion: 'otro', termino_busqueda: null, categoria: null };\n}\n\nreturn {\n  ...parsed,\n  phone: $('Extraer Datos').first().json.phone\n};"
+      },
+      "id": "node-parse-ai",
+      "name": "Parsear Clasificacion",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 300]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.intencion }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "verificar",
+              "outputKey": "verificar"
+            },
+            {
+              "value2": "recomendar",
+              "outputKey": "recomendar"
+            }
+          ]
+        },
+        "fallbackOutput": "otro"
+      },
+      "id": "node-switch",
+      "name": "Router de Intencion",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [1080, 300]
+    },
+    {
+      "parameters": {
+        "url": "[https://rwovvnzlaqiqrmngitxo.supabase.co/rest/v1/merchants](https://rwovvnzlaqiqrmngitxo.supabase.co/rest/v1/merchants)",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "TU_SUPABASE_ANON_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer TU_SUPABASE_ANON_KEY"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "or",
+              "value": "=(tienda.ilike.*{{ $json.termino_busqueda }}*,instagram.ilike.*{{ $json.termino_busqueda }}*,rif.ilike.*{{$json.termino_busqueda }}*)"
+            },
+            {
+              "name": "select",
+              "value": "*"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-sb-verificar",
+      "name": "Supabase: Buscar Comercio",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 180]
+    },
+    {
+      "parameters": {
+        "url": "[https://rwovvnzlaqiqrmngitxo.supabase.co/rest/v1/merchants](https://rwovvnzlaqiqrmngitxo.supabase.co/rest/v1/merchants)",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "TU_SUPABASE_ANON_KEY"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer TU_SUPABASE_ANON_KEY"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "categoria",
+              "value": "=ilike.*{{ $json.categoria }}*"
+            },
+            {
+              "name": "estado",
+              "value": "eq.activo"
+            },
+            {
+              "name": "order",
+              "value": "nivel_verificacion.desc"
+            },
+            {
+              "name": "limit",
+              "value": "3"
+            },
+            {
+              "name": "select",
+              "value": "*"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "node-sb-recomendar",
+      "name": "Supabase: Recomendar Comercios",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1320, 360]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst phone =$('Parsear Clasificacion').first().json.phone;\nlet msg = '';\n\nif (items.length > 0 && items[0].json && items[0].json.id) {\n  const row = items[0].json;\n  if (row.estado === 'activo') {\n    msg = `🛡️ *Verifik Shield - Certificado Verificado*\\n\\n` +\n          `Comercio: *${row.tienda}*\\n` +\n          `Nivel de Confianza: Nivel ${row.nivel_verificacion || 1} ⭐\\n` +\n          `RIF: ${row.rif || 'N/A'}\\n\\n` +\n          `🔗 Revisa el certificado oficial aquí:\\n${row.url || 'Sin enlace disponible'}`;\n  } else {\n    msg = `⚠️ El comercio *${row.tienda}* está registrado pero su estatus no se encuentra activo actualmente.`;\n  }\n} else {\n  msg = `❌ *Comercio no verificado en Verifik Shield.*\\n\\nNo encontramos registros activos para esa consulta. Te recomendamos operar con precaución o solicitarle que valide su certificación con nosotros.`;\n}\n\nreturn { reply: msg, phone };"
+      },
+      "id": "node-msg-verificar",
+      "name": "Formatear Mensaje Verificacion",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 180]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst phone =$('Parsear Clasificacion').first().json.phone;\nlet msg = '';\n\nif (items.length > 0 && items[0].json && items[0].json.id) {\n  msg = `🌟 *Comercios Recomendados por Verifik Shield*\\n\\n`;\n  items.forEach((item, index) => {\n    const row = item.json;\n    msg += `${index + 1}. *${row.tienda}* (Nivel ${row.nivel_verificacion})\\n` +\n           `📂 Categoría: ${row.categoria}\\n` +\n           `🔗 Certificado: ${row.url}\\n\\n`;\n  });\n} else {\n  msg = `ℹ️ Aún no contamos con comercios certificados activos en esa categoría específica.`;\n}\n\nreturn { reply: msg, phone };"
+      },
+      "id": "node-msg-recomendar",
+      "name": "Formatear Mensaje Recomendacion",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 360]
+    },
+    {
+      "parameters": {
+        "jsCode": "const phone = $('Parsear Clasificacion').first().json.phone;\nconst msg = `👋 ¡Hola! Soy el asistente de *Verifik Shield*.\\n\\n` +\n            `Puedo ayudarte a:\\n` +\n            `1️⃣ *Verificar un comercio:* Escribe su nombre, RIF o cuenta de Instagram.\\n` +\n            `2️⃣ *Recomendar opciones seguras:* Pregúntame por comercios certificados en un rubro (ej: Supermercados, Repuestos).\\n\\n` +\n            `¿En qué puedo ayudarte hoy?`;\n\nreturn { reply: msg, phone };"
+      },
+      "id": "node-msg-otro",
+      "name": "Mensaje Bienvenida",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1560, 520]
+    }
+  ],
+  "connections": {
+    "Webhook WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "Extraer Datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer Datos": {
+      "main": [
+        [
+          {
+            "node": "Gemini Clasificador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gemini Clasificador": {
+      "main": [
+        [
+          {
+            "node": "Parsear Clasificacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parsear Clasificacion": {
+      "main": [
+        [
+          {
+            "node": "Router de Intencion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Router de Intencion": {
+      "main": [
+        [
+          {
+            "node": "Supabase: Buscar Comercio",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Supabase: Recomendar Comercios",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mensaje Bienvenida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase: Buscar Comercio": {
+      "main": [
+        [
+          {
+            "node": "Formatear Mensaje Verificacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase: Recomendar Comercios": {
+      "main": [
+        [
+          {
+            "node": "Formatear Mensaje Recomendacion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

@@ -6,7 +6,6 @@ const { createClient } = require('@supabase/supabase-js');
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// Inicializar cliente de Supabase
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
@@ -15,17 +14,12 @@ const supabase = createClient(
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Servir la vista de admin
+// Servir Admin
 app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-// Servir la vista de certificado público
-app.get('/verify', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'verify.html'));
-});
-
-// API: Obtener todos los comercios
+// API: Listar todos los comercios
 app.get('/api/merchants', async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -36,24 +30,32 @@ app.get('/api/merchants', async (req, res) => {
     if (error) return res.status(400).json({ success: false, message: error.message });
     return res.json({ success: true, data });
   } catch (err) {
-    return res.status(500).json({ success: false, message: 'Error en el servidor' });
+    return res.status(500).json({ success: false, message: 'Error interno del servidor' });
   }
 });
 
-// API: Consultar un certificado flexible (acepta slug o nombre exacto)
-app.get('/api/verify/:tienda', async (req, res) => {
-  const { tienda } = req.params;
+// API: Consulta pública de certificado (por parámetro o por path)
+app.get('/api/verify', async (req, res) => {
+  const queryId = req.query.id || req.query.tienda;
+  if (!queryId) return res.status(400).json({ success: false, message: 'ID de tienda requerido' });
+  return buscarComercio(queryId, res);
+});
 
+app.get('/api/verify/:tienda', async (req, res) => {
+  return buscarComercio(req.params.tienda, res);
+});
+
+async function buscarComercio(termino, res) {
   try {
     const { data, error } = await supabase.from('merchants').select('*');
     if (error) return res.status(400).json({ success: false, message: error.message });
 
-    const cleanInput = tienda.toLowerCase().replace(/[\s-]+/g, '');
+    const cleanInput = termino.toLowerCase().replace(/[\s-]+/g, '');
 
     const merchant = data.find(m => {
       if (!m.tienda) return false;
       const cleanTienda = m.tienda.toLowerCase().replace(/[\s-]+/g, '');
-      return cleanTienda === cleanInput;
+      return cleanTienda === cleanInput || m.id == termino;
     });
 
     if (!merchant) {
@@ -62,29 +64,27 @@ app.get('/api/verify/:tienda', async (req, res) => {
 
     return res.json({ success: true, data: merchant });
   } catch (err) {
-    return res.status(500).json({ success: false, message: 'Error interno al consultar certificado' });
+    return res.status(500).json({ success: false, message: 'Error al verificar certificado' });
   }
-});
+}
 
-// API: Actualizar datos de un comercio (Coordenadas, Nivel, etc.)
+// API: Actualizar comercio (Coordenadas / Nivel)
 app.put('/api/merchants/:id', async (req, res) => {
   const { id } = req.params;
-  const updateData = req.body;
-
   try {
     const { data, error } = await supabase
       .from('merchants')
-      .update(updateData)
+      .update(req.body)
       .eq('id', id)
       .select();
 
     if (error) return res.status(400).json({ success: false, message: error.message });
     return res.json({ success: true, data });
   } catch (err) {
-    return res.status(500).json({ success: false, message: 'Error al actualizar el comercio' });
+    return res.status(500).json({ success: false, message: 'Error al actualizar' });
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor Verifik Shield corriendo en puerto ${PORT}`);
+  console.log(`Verifik Shield corriendo en puerto ${PORT}`);
 });

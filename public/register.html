@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registro - Verifik</title>
+  <title>Registro de Comercio - Verifik Shield</title>
   <style>
     :root {
       --bg-color: #0f172a;
@@ -38,40 +38,47 @@
       border-radius: 12px;
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
       width: 100%;
-      max-width: 420px;
+      max-width: 480px;
     }
 
     h2 {
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       color: var(--accent-color);
     }
 
     .form-group {
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
 
     label {
       display: block;
-      margin-bottom: 6px;
-      font-size: 14px;
+      margin-bottom: 4px;
+      font-size: 13px;
       color: #cbd5e1;
     }
 
     input, select {
       width: 100%;
-      padding: 12px;
+      padding: 10px;
       border-radius: 6px;
       border: 1px solid var(--border-color);
       background-color: var(--input-bg);
       color: #fff;
       font-size: 14px;
       outline: none;
-      transition: border-color 0.2s;
     }
 
     input:focus, select:focus {
       border-color: var(--accent-color);
+    }
+
+    .section-title {
+      font-size: 14px;
+      color: var(--accent-color);
+      margin: 18px 0 10px 0;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 4px;
     }
 
     button {
@@ -84,8 +91,7 @@
       font-weight: bold;
       font-size: 16px;
       cursor: pointer;
-      transition: background-color 0.2s;
-      margin-top: 10px;
+      margin-top: 15px;
     }
 
     button:hover {
@@ -112,58 +118,84 @@
       color: #f87171;
       border: 1px solid #ef4444;
     }
-
-    .login-link {
-      text-align: center;
-      margin-top: 20px;
-      font-size: 14px;
-      color: #94a3b8;
-    }
-
-    .login-link a {
-      color: var(--accent-color);
-      text-decoration: none;
-    }
-
-    .login-link a:hover {
-      text-decoration: underline;
-    }
   </style>
 </head>
 <body>
 
   <div class="container">
-    <h2>Registro en Verifik</h2>
+    <h2>Certificar Comercio</h2>
     
     <form id="registerForm">
       <div class="form-group">
-        <label for="nombre">Nombre Completo</label>
-        <input type="text" id="nombre" required placeholder="Ej. Juan Pérez">
+        <label for="tienda">Nombre de la Tienda / Comercio *</label>
+        <input type="text" id="tienda" required placeholder="Ej. Bodega Jesús">
       </div>
 
       <div class="form-group">
-        <label for="email">Correo Electrónico</label>
-        <input type="email" id="email" required placeholder="correo@ejemplo.com">
+        <label for="rif">RIF o Cédula *</label>
+        <input type="text" id="rif" required placeholder="Ej. J-296424999">
       </div>
 
       <div class="form-group">
-        <label for="cedula">Cédula / Documento de Identidad</label>
-        <input type="text" id="cedula" required placeholder="V-12345678">
+        <label for="propietario">Nombre del Propietario</label>
+        <input type="text" id="propietario" placeholder="Ej. Jesús Moya">
       </div>
 
       <div class="form-group">
-        <label for="password">Contraseña</label>
-        <input type="password" id="password" required placeholder="••••••••">
+        <label for="telefono">Teléfono de Contacto (WhatsApp) *</label>
+        <input type="text" id="telefono" required placeholder="+584128425733">
       </div>
 
-      <button type="submit">Crear Cuenta</button>
+      <div class="form-group">
+        <label for="direccion">Dirección en Maturín</label>
+        <input type="text" id="direccion" placeholder="Ej. Las Vírgenes, Tipuro, Centro">
+      </div>
+
+      <div class="form-group">
+        <label for="categoria">Categoría</label>
+        <select id="categoria">
+          <option value="General">General / Víveres</option>
+          <option value="Repuestos">Repuestos Automotrices</option>
+          <option value="Tecnología">Tecnología y Celulares</option>
+          <option value="Gastronomía">Gastronomía y Comida</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="instagram">Usuario de Instagram (Opcional)</label>
+        <input type="text" id="instagram" placeholder="Ej. tu_comercio">
+      </div>
+
+      <div class="section-title">💳 Datos de Pago Móvil Oficial</div>
+
+      <div class="form-group">
+        <label for="banco_pago">Banco</label>
+        <input type="text" id="banco_pago" placeholder="Ej. Banesco / Mercantil">
+      </div>
+
+      <div class="form-group">
+        <label for="cedula_pago">Cédula / RIF de la Cuenta</label>
+        <input type="text" id="cedula_pago" placeholder="Ej. 29642499">
+      </div>
+
+      <div class="form-group">
+        <label for="telefono_pago">Teléfono de Pago Móvil</label>
+        <input type="text" id="telefono_pago" placeholder="Ej. 04128425733">
+      </div>
+
+      <div class="form-group">
+        <label for="plan_id">Plan de Certificación</label>
+        <select id="plan_id">
+          <option value="basico">Plan Básico ($2/mes) - Sello Digital</option>
+          <option value="pro">Plan Pro Top 3 ($4/mes) - QR HD + Podio WhatsApp</option>
+          <option value="empresa">Plan Empresa ($12.50/mes) - Multi-sucursal</option>
+        </select>
+      </div>
+
+      <button type="submit">Registrar y Certificar</button>
     </form>
 
     <div id="message"></div>
-
-    <div class="login-link">
-      ¿Ya tienes cuenta? <a href="/index.html">Inicia sesión aquí</a>
-    </div>
   </div>
 
   <script>
@@ -173,35 +205,41 @@
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const nombre = document.getElementById('nombre').value;
-      const email = document.getElementById('email').value;
-      const cedula = document.getElementById('cedula').value;
-      const password = document.getElementById('password').value;
+      const payload = {
+        tienda: document.getElementById('tienda').value,
+        rif: document.getElementById('rif').value,
+        propietario: document.getElementById('propietario').value,
+        telefono: document.getElementById('telefono').value,
+        direccion: document.getElementById('direccion').value,
+        categoria: document.getElementById('categoria').value,
+        instagram: document.getElementById('instagram').value,
+        banco_pago: document.getElementById('banco_pago').value,
+        cedula_pago: document.getElementById('cedula_pago').value,
+        telefono_pago: document.getElementById('telefono_pago').value,
+        plan_id: document.getElementById('plan_id').value
+      };
 
       messageDiv.style.display = 'none';
-      messageDiv.className = '';
 
       try {
         const response = await fetch('/api/register', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ nombre, email, cedula, password })
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
         });
 
         const data = await response.json();
 
-        if (response.ok) {
-          messageDiv.textContent = '¡Registro exitoso! Redirigiendo...';
+        if (response.ok && data.success) {
+          messageDiv.textContent = '¡Comercio registrado con éxito! Redirigiendo...';
           messageDiv.className = 'success';
           messageDiv.style.display = 'block';
 
           setTimeout(() => {
-            window.location.href = '/index.html';
+            window.location.href = '/client-verify';
           }, 2000);
         } else {
-          messageDiv.textContent = data.message || 'Error al registrar el usuario.';
+          messageDiv.textContent = data.message || 'Error al registrar el comercio.';
           messageDiv.className = 'error';
           messageDiv.style.display = 'block';
         }

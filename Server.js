@@ -1,101 +1,31 @@
+require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
-require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 10000;
 
-// Middleware para procesar datos JSON y de formularios
+// Inicializar cliente de Supabase
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
+
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Middleware para desactivar caché en navegadores
-app.use((req, res, next) => {
-  res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-  res.set('Pragma', 'no-cache');
-  res.set('Expires', '0');
-  next();
-});
-
-// Servir archivos estáticos desde la carpeta /public
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Inicializar cliente de Supabase
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-// ==========================================
-// 🚀 ENDPOINT API: REGISTRO DE COMERCIOS
-// ==========================================
-app.post('/api/register', async (req, res) => {
-  try {
-    const {
-      tienda,
-      rif,
-      propietario,
-      telefono,
-      direccion,
-      categoria,
-      instagram,
-      banco_pago,
-      cedula_pago,
-      telefono_pago,
-      latitud,
-      longitud,
-      plan_id
-    } = req.body;
-
-    // Validación básica de campos requeridos
-    if (!tienda || !rif || !telefono) {
-      return res.status(400).json({
-        success: false,
-        message: 'Los campos Tienda, RIF y Teléfono son obligatorios.'
-      });
-    }
-
-    // Insertar en la tabla public.merchants
-    const { data, error } = await supabase
-      .from('merchants')
-      .insert([
-        {
-          tienda,
-          rif,
-          propietario: propietario || null,
-          telefono: telefono || null,
-          direccion: direccion || null,
-          categoria: categoria || 'General',
-          instagram: instagram || null,
-          banco_pago_r: banco_pago || null,
-          cedula_pago_r: cedula_pago || null,
-          telefono_pa: telefono_pago || null,
-          latitud: latitud ? parseFloat(latitud) : null,
-          longitud: longitud ? parseFloat(longitud) : null,
-          plan_id: plan_id || 'basico',
-          nivel_verificacion: 1,
-          estado: 'activo'
-        }
-      ])
-      .select();
-
-    if (error) {
-      console.error('Error de Supabase:', error);
-      return res.status(400).json({ success: false, message: error.message });
-    }
-
-    return res.status(201).json({
-      success: true,
-      message: 'Comercio registrado exitosamente',
-      data: data[0]
-    });
-
-  } catch (err) {
-    console.error('Error interno del servidor:', err);
-    return res.status(500).json({ success: false, message: 'Error interno en el servidor' });
-  }
+// Servir la vista de admin
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
-// Endpoint para obtener todos los comercios (para el panel admin)
+
+// Servir la vista de certificado público
+app.get('/verify', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'verify.html'));
+});
+
+// API: Obtener todos los comercios
 app.get('/api/merchants', async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -106,58 +36,55 @@ app.get('/api/merchants', async (req, res) => {
     if (error) return res.status(400).json({ success: false, message: error.message });
     return res.json({ success: true, data });
   } catch (err) {
-    return res.status(500).json({ success: false, message: 'Error en servidor' });
+    return res.status(500).json({ success: false, message: 'Error en el servidor' });
   }
 });
 
-// Endpoint para actualizar ubicación y estado de un comercio
+// API: Consultar un certificado flexible (acepta slug o nombre exacto)
+app.get('/api/verify/:tienda', async (req, res) => {
+  const { tienda } = req.params;
+
+  try {
+    const { data, error } = await supabase.from('merchants').select('*');
+    if (error) return res.status(400).json({ success: false, message: error.message });
+
+    const cleanInput = tienda.toLowerCase().replace(/[\s-]+/g, '');
+
+    const merchant = data.find(m => {
+      if (!m.tienda) return false;
+      const cleanTienda = m.tienda.toLowerCase().replace(/[\s-]+/g, '');
+      return cleanTienda === cleanInput;
+    });
+
+    if (!merchant) {
+      return res.status(404).json({ success: false, message: 'Comercio no encontrado' });
+    }
+
+    return res.json({ success: true, data: merchant });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Error interno al consultar certificado' });
+  }
+});
+
+// API: Actualizar datos de un comercio (Coordenadas, Nivel, etc.)
 app.put('/api/merchants/:id', async (req, res) => {
   const { id } = req.params;
-  const { latitud, longitud, nivel_verificacion, estado, direccion } = req.body;
+  const updateData = req.body;
 
   try {
     const { data, error } = await supabase
       .from('merchants')
-      .update({
-        latitud: latitud ? parseFloat(latitud) : null,
-        longitud: longitud ? parseFloat(longitud) : null,
-        nivel_verificacion: nivel_verificacion ? parseInt(nivel_verificacion) : 1,
-        estado: estado || 'activo',
-        direccion: direccion || null
-      })
+      .update(updateData)
       .eq('id', id)
       .select();
 
     if (error) return res.status(400).json({ success: false, message: error.message });
-    return res.json({ success: true, message: 'Comercio actualizado con éxito', data: data[0] });
+    return res.json({ success: true, data });
   } catch (err) {
-    return res.status(500).json({ success: false, message: 'Error actualizando comercio' });
+    return res.status(500).json({ success: false, message: 'Error al actualizar el comercio' });
   }
 });
-// ==========================================
-// 🌐 RUTAS DE VISTAS HTML
-// ==========================================
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
 
-app.get('/register', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'register.html'));
-});
-
-app.get('/client-verify', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'client-verify.html'));
-});
-
-app.get('/verify', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'verify.html'));
-});
-
-app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
-});
-
-// Iniciar Servidor
 app.listen(PORT, () => {
-  console.log(`🛡️ Servidor Verifik Shield activo en el puerto ${PORT}`);
+  console.log(`Servidor Verifik Shield corriendo en puerto ${PORT}`);
 });

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Auditoría & Gestión - Verifik Shield</title>
-  
+
   <!-- Leaflet CSS Mapa -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
@@ -16,124 +16,33 @@
       --text: #f9fafb;
       --text-muted: #9ca3af;
       --accent: #38bdf8;
-      --accent-hover: #0284c7;
-      --success: #22c55e;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding: 30px; }
 
-    .header-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 25px;
-    }
-
-    .badge-pill {
-      background: rgba(56, 189, 248, 0.1);
-      color: var(--accent);
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: bold;
-      letter-spacing: 1px;
-    }
-
+    .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+    .badge-pill { background: rgba(56, 189, 248, 0.1); color: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; }
     h1 { font-size: 22px; margin-top: 5px; }
 
-    .btn-refresh {
-      background: #2563eb;
-      color: #fff;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
+    .btn-refresh { background: #2563eb; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
     .btn-refresh:hover { background: #1d4ed8; }
 
-    .table-container {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-    }
+    .table-container { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+    th { background: #1f2937; color: var(--text-muted); padding: 14px 16px; font-size: 11px; text-transform: uppercase; }
+    td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 13px;
-    }
-
-    th {
-      background: #1f2937;
-      color: var(--text-muted);
-      padding: 14px 16px;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    td {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: middle;
-    }
-
-    tr:hover { background: rgba(255, 255, 255, 0.02); }
-
-    .merchant-name { font-weight: bold; color: #fff; font-size: 14px; }
-    .merchant-link { color: var(--accent); text-decoration: none; font-size: 11px; }
-
-    .btn-map {
-      background: rgba(56, 189, 248, 0.15);
-      color: var(--accent);
-      border: 1px solid var(--accent);
-      padding: 6px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 12px;
-    }
-
+    .btn-map { background: rgba(56, 189, 248, 0.15); color: var(--accent); border: 1px solid var(--accent); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; }
     .btn-map:hover { background: var(--accent); color: #000; }
 
-    select {
-      background: #111827;
-      color: #fff;
-      border: 1px solid var(--border);
-      padding: 6px 10px;
-      border-radius: 6px;
-      outline: none;
-      cursor: pointer;
-    }
+    select { background: #111827; color: #fff; border: 1px solid var(--border); padding: 6px 10px; border-radius: 6px; cursor: pointer; }
 
-    /* Modal de Mapa */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      width: 90%;
-      max-width: 600px;
-      padding: 20px;
-    }
-
+    /* Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; width: 90%; max-width: 600px; padding: 20px; }
     #map { height: 320px; border-radius: 8px; margin: 15px 0; border: 1px solid var(--border); }
-
+    
     .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
     .btn-cancel { background: #374151; color: #fff; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; }
     .btn-save { background: var(--accent); color: #000; font-weight: bold; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; }
@@ -170,13 +79,9 @@
   <!-- Modal Mapa -->
   <div class="modal-overlay" id="mapModal">
     <div class="modal-card">
-      <h3 id="modalTitle">📍 Geolocalizar Comercio</h3>
-      <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
-        Haz clic en el mapa de Maturín o arrastra el marcador para fijar la ubicación exacta.
-      </p>
-
+      <h3 id="modalTitle">📍 Ubicar Comercio</h3>
       <div id="map"></div>
-
+      
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
         <div>
           <label style="font-size: 11px; color: var(--text-muted);">Latitud</label>
@@ -203,7 +108,6 @@
     let marker = null;
     let activeMerchant = null;
 
-    // Coordenadas iniciales: Maturín, Venezuela
     const MATURIN_LAT = 9.7457;
     const MATURIN_LNG = -63.1832;
 
@@ -213,9 +117,7 @@
       try {
         const res = await fetch('/api/merchants');
         const result = await res.json();
-        if (result.success) {
-          renderTable(result.data);
-        }
+        if (result.success) renderTable(result.data);
       } catch (err) {
         console.error('Error al cargar datos:', err);
       }
@@ -229,30 +131,28 @@
         const tr = document.createElement('tr');
         const hasCoords = m.latitud && m.longitud;
 
-        // Recuperar información de Pago Móvil probando todas las variaciones de nombres de columna
+        // Búsqueda flexible de campos de Pago Móvil en la fila
         const banco = m.banco_pago_r || m.banco_pago || m.banco || '';
-        const cedula = m.cedula_pago_r || m.cedula_pago || m.cedula || '';
-        const telefono = m.telefono_pago_r || m.telefono_pago || m.telefono || '';
+        const cedula = m.cedula_pago_r || m.cedula_pago || m.cedula || m.cedula_r || '';
+        const telefono = m.telefono_pago_r || m.telefono_pago || m.telefono || m.telefono_r || '';
 
         let pagoMovilTexto = 'No registrado';
         if (banco || cedula || telefono) {
           pagoMovilTexto = `${banco} ${cedula ? '- ' + cedula : ''} ${telefono ? '(' + telefono + ')' : ''}`.trim();
         }
 
-        const slug = m.tienda ? m.tienda.toLowerCase().replace(/\s+/g, '-') : '';
+        const tiendaSlug = m.tienda ? m.tienda.toLowerCase().replace(/\s+/g, '-') : '';
 
         tr.innerHTML = `
           <td>
-            <div class="merchant-name">${m.tienda || 'Sin Nombre'}</div>
-            <a href="/verify?id=${slug}" class="merchant-link" target="_blank">/verify?id=${slug}</a>
+            <div style="font-weight: bold; color: #fff;">${m.tienda || 'Sin Nombre'}</div>
+            <a href="/verify?id=${tiendaSlug}" target="_blank" style="color: var(--accent); font-size: 11px;">/verify?id=${tiendaSlug}</a>
           </td>
           <td>
             <div>${m.rif || 'Sin RIF'}</div>
-            <div style="color: var(--text-muted); font-size: 11px;">${m.propietario || 'No especificado'}</div>
+            <div style="color: var(--text-muted); font-size: 11px;">${m.propietario || ''}</div>
           </td>
-          <td>
-            <div>${pagoMovilTexto}</div>
-          </td>
+          <td>${pagoMovilTexto}</td>
           <td>
             <button class="btn-map" onclick='openMapModal(${JSON.stringify(m)})'>
               ${hasCoords ? '📍 Editar Coordenadas' : '➕ Asignar Mapa'}
@@ -266,7 +166,7 @@
             </select>
           </td>
           <td>
-            <a href="/verify?id=${slug}" style="color: var(--accent); font-size: 12px;" target="_blank">Ver Certificado</a>
+            <a href="/verify?id=${tiendaSlug}" target="_blank" style="color: var(--accent); font-size: 12px;">Ver Certificado</a>
           </td>
         `;
         tbody.appendChild(tr);
@@ -331,14 +231,14 @@
 
         const data = await res.json();
         if (data.success) {
-          alert('✅ Coordenadas guardadas correctamente');
+          alert('✅ Coordenadas guardadas');
           closeModal();
           loadMerchants();
         } else {
-          alert('❌ Error al guardar: ' + (data.message || 'Error desconocido'));
+          alert('❌ Error: ' + data.message);
         }
       } catch (err) {
-        alert('❌ Error de conexión con el servidor');
+        alert('❌ Error de conexión');
       }
     }
 

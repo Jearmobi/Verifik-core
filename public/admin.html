@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Auditoría & Gestión - Verifik Shield</title>
-  
-  <!-- Leaflet CSS Mapa -->
+
+  <!-- Leaflet CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
   <style>
@@ -16,120 +16,28 @@
       --text: #f9fafb;
       --text-muted: #9ca3af;
       --accent: #38bdf8;
-      --accent-hover: #0284c7;
-      --success: #22c55e;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding: 30px; }
 
-    .header-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 25px;
-    }
-
-    .badge-pill {
-      background: rgba(56, 189, 248, 0.1);
-      color: var(--accent);
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: bold;
-      letter-spacing: 1px;
-    }
-
+    .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+    .badge-pill { background: rgba(56, 189, 248, 0.1); color: var(--accent); padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; }
     h1 { font-size: 22px; margin-top: 5px; }
 
-    .btn-refresh {
-      background: #2563eb;
-      color: #fff;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+    .table-container { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+    th { background: #1f2937; color: var(--text-muted); padding: 14px 16px; font-size: 11px; text-transform: uppercase; }
+    td { padding: 14px 16px; border-bottom: 1px solid var(--border); }
 
-    .table-container {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 13px;
-    }
-
-    th {
-      background: #1f2937;
-      color: var(--text-muted);
-      padding: 14px 16px;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    td {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
-      vertical-align: middle;
-    }
-
-    tr:hover { background: rgba(255, 255, 255, 0.02); }
-
-    .merchant-name { font-weight: bold; color: #fff; font-size: 14px; }
-    .merchant-link { color: var(--accent); text-decoration: none; font-size: 11px; }
-
-    .btn-map {
-      background: rgba(56, 189, 248, 0.15);
-      color: var(--accent);
-      border: 1px solid var(--accent);
-      padding: 6px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 12px;
-    }
-
+    .btn-map { background: rgba(56, 189, 248, 0.15); color: var(--accent); border: 1px solid var(--accent); padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; }
     .btn-map:hover { background: var(--accent); color: #000; }
 
-    select {
-      background: #111827;
-      color: #fff;
-      border: 1px solid var(--border);
-      padding: 6px 10px;
-      border-radius: 6px;
-      outline: none;
-    }
-
-    /* Modal de Mapa */
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      width: 90%;
-      max-width: 600px;
-      padding: 20px;
-    }
-
+    /* Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 1000; }
+    .modal-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; width: 90%; max-width: 600px; padding: 20px; }
     #map { height: 320px; border-radius: 8px; margin: 15px 0; border: 1px solid var(--border); }
-
+    
     .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
     .btn-cancel { background: #374151; color: #fff; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; }
     .btn-save { background: var(--accent); color: #000; font-weight: bold; border: none; padding: 10px 16px; border-radius: 6px; cursor: pointer; }
@@ -142,23 +50,21 @@
       <span class="badge-pill">PANEL DE CONTROL</span>
       <h1>Auditoría & Gestión Verifik Shield</h1>
     </div>
-    <button class="btn-refresh" onclick="loadMerchants()">Actualizar Datos</button>
   </div>
 
   <div class="table-container">
     <table>
       <thead>
         <tr>
-          <th>Comercio / ID</th>
-          <th>RIF & Propietario</th>
+          <th>Comercio</th>
+          <th>RIF / Propietario</th>
           <th>Pago Móvil</th>
-          <th>Ubicación / Mapa</th>
-          <th>Nivel de Seguridad</th>
+          <th>Ubicación</th>
           <th>Acción</th>
         </tr>
       </thead>
       <tbody id="merchants-table">
-        <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Cargando comercios...</td></tr>
+        <tr><td colspan="5" style="text-align:center;">Cargando comercios...</td></tr>
       </tbody>
     </table>
   </div>
@@ -166,13 +72,9 @@
   <!-- Modal Mapa -->
   <div class="modal-overlay" id="mapModal">
     <div class="modal-card">
-      <h3 id="modalTitle">📍 Geolocalizar Comercio</h3>
-      <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
-        Haz clic en el mapa de Maturín o arrastra el pin para fijar la ubicación exacta.
-      </p>
-
+      <h3 id="modalTitle">📍 Ubicar Comercio en Mapa</h3>
       <div id="map"></div>
-
+      
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
         <div>
           <label style="font-size: 11px; color: var(--text-muted);">Latitud</label>
@@ -191,26 +93,25 @@
     </div>
   </div>
 
-  <!-- Leaflet JS -->
+  <!-- Leaflet JS CDN -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
-    let map, marker;
-    let activeMerchant = null;
+    let map = null;
+    let marker = null;
+    let activeMerchantId = null;
+
+    // Centro inicial: Maturín, Monagas
     const MATURIN_LAT = 9.7457;
     const MATURIN_LNG = -63.1832;
 
-    document.addEventListener('DOMContentLoaded', () => {
-      loadMerchants();
-    });
+    document.addEventListener('DOMContentLoaded', loadMerchants);
 
     async function loadMerchants() {
       try {
         const res = await fetch('/api/merchants');
         const result = await res.json();
-        if (result.success) {
-          renderTable(result.data);
-        }
+        if (result.success) renderTable(result.data);
       } catch (err) {
         console.error('Error al cargar datos:', err);
       }
@@ -225,53 +126,40 @@
         const hasCoords = m.latitud && m.longitud;
 
         tr.innerHTML = `
+          <td><strong>${m.tienda || 'Sin Nombre'}</strong></td>
+          <td>${m.rif || 'Sin RIF'} <br><small style="color:var(--text-muted);">${m.propietario || ''}</small></td>
+          <td>${m.banco_pago || 'N/A'} - ${m.cedula_pago || ''}</td>
           <td>
-            <div class="merchant-name">${m.tienda || 'Sin Nombre'}</div>
-            <a href="/verify?id=${m.tienda?.toLowerCase().replace(/\s+/g, '-')}" class="merchant-link" target="_blank">/verify?id=${m.tienda}</a>
-          </td>
-          <td>
-            <div>${m.rif || 'Sin RIF'}</div>
-            <div style="color: var(--text-muted); font-size: 11px;">${m.propietario || 'No especificado'}</div>
-          </td>
-          <td>
-            <div>${m.banco_pago_r || m.banco_pago || 'No registrado'} - ${m.cedula_pago_r || m.cedula_pago || ''}</div>
-          </td>
-          <td>
-            <button class="btn-map" onclick='openMapModal(${JSON.stringify(m)})'>
-              ${hasCoords ? '📍 Editar Coordenadas' : '➕ Asignar Mapa'}
+            <button class="btn-map" onclick="openMapModal('${m.id}', '${m.tienda}', ${m.latitud}, ${m.longitud})">
+              ${hasCoords ? '📍 Editar Coordenadas' : '➕ Configurar Mapa'}
             </button>
           </td>
-          <td>
-            <select onchange="updateLevel('${m.id}', this.value)">
-              <option value="1" ${m.nivel_verificacion == 1 ? 'selected' : ''}>1★ Básico</option>
-              <option value="2" ${m.nivel_verificacion == 2 ? 'selected' : ''}>2★ Comercial</option>
-              <option value="3" ${m.nivel_verificacion == 3 ? 'selected' : ''}>3★ Gold</option>
-            </select>
-          </td>
-          <td>
-            <a href="/verify?id=${m.tienda?.toLowerCase().replace(/\s+/g, '-')}" style="color: var(--accent); font-size: 12px;" target="_blank">Ver Certificado</a>
-          </td>
+          <td><a href="/verify?id=${m.tienda}" target="_blank" style="color:var(--accent);">Ver Certificado</a></td>
         `;
         tbody.appendChild(tr);
       });
     }
 
-    function openMapModal(merchant) {
-      activeMerchant = merchant;
-      document.getElementById('modalTitle').textContent = `📍 Ubicar: ${merchant.tienda}`;
+    function openMapModal(id, tienda, lat, lng) {
+      activeMerchantId = id;
+      document.getElementById('modalTitle').textContent = `📍 Ubicar: ${tienda}`;
       document.getElementById('mapModal').style.display = 'flex';
 
-      const lat = merchant.latitud ? parseFloat(merchant.latitud) : MATURIN_LAT;
-      const lng = merchant.longitud ? parseFloat(merchant.longitud) : MATURIN_LNG;
+      const initialLat = lat ? parseFloat(lat) : MATURIN_LAT;
+      const initialLng = lng ? parseFloat(lng) : MATURIN_LNG;
 
-      document.getElementById('latInput').value = lat;
-      document.getElementById('lngInput').value = lng;
+      document.getElementById('latInput').value = initialLat.toFixed(6);
+      document.getElementById('lngInput').value = initialLng.toFixed(6);
 
+      // Esperar a que la ventana modal sea visible para renderizar el mapa correctamente
       setTimeout(() => {
         if (!map) {
-          map = L.map('map').setView([lat, lng], 14);
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
-          marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+          map = L.map('map').setView([initialLat, initialLng], 14);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+          }).addTo(map);
+
+          marker = L.marker([initialLat, initialLng], { draggable: true }).addTo(map);
 
           marker.on('dragend', function () {
             const pos = marker.getLatLng();
@@ -285,8 +173,8 @@
             document.getElementById('lngInput').value = e.latlng.lng.toFixed(6);
           });
         } else {
-          map.setView([lat, lng], 14);
-          marker.setLatLng([lat, lng]);
+          map.setView([initialLat, initialLng], 14);
+          marker.setLatLng([initialLat, initialLng]);
           map.invalidateSize();
         }
       }, 200);
@@ -297,13 +185,13 @@
     }
 
     async function saveLocation() {
-      if (!activeMerchant) return;
+      if (!activeMerchantId) return;
 
       const lat = document.getElementById('latInput').value;
       const lng = document.getElementById('lngInput').value;
 
       try {
-        const res = await fetch(`/api/merchants/${activeMerchant.id}`, {
+        const res = await fetch(`/api/merchants/${activeMerchantId}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ latitud: lat, longitud: lng })
@@ -311,26 +199,14 @@
 
         const data = await res.json();
         if (data.success) {
-          alert('✅ Coordenadas guardadas correctamente en Supabase');
+          alert('✅ Coordenadas guardadas en Supabase');
           closeModal();
           loadMerchants();
         } else {
-          alert('❌ Error al guardar: ' + data.message);
+          alert('❌ Error: ' + data.message);
         }
       } catch (err) {
-        alert('❌ Error de conexión');
-      }
-    }
-
-    async function updateLevel(id, nivel) {
-      try {
-        await fetch(`/api/merchants/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nivel_verificacion: nivel })
-        });
-      } catch (err) {
-        console.error('Error actualizando nivel:', err);
+        alert('❌ Error al conectar con el servidor');
       }
     }
   </script>

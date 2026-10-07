@@ -95,7 +95,45 @@ app.post('/api/register', async (req, res) => {
     return res.status(500).json({ success: false, message: 'Error interno en el servidor' });
   }
 });
+// Endpoint para obtener todos los comercios (para el panel admin)
+app.get('/api/merchants', async (req, res) => {
+  try {
+    const { data, error } = await supabase
+      .from('merchants')
+      .select('*')
+      .order('created_at', { ascending: false });
 
+    if (error) return res.status(400).json({ success: false, message: error.message });
+    return res.json({ success: true, data });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Error en servidor' });
+  }
+});
+
+// Endpoint para actualizar ubicación y estado de un comercio
+app.put('/api/merchants/:id', async (req, res) => {
+  const { id } = req.params;
+  const { latitud, longitud, nivel_verificacion, estado, direccion } = req.body;
+
+  try {
+    const { data, error } = await supabase
+      .from('merchants')
+      .update({
+        latitud: latitud ? parseFloat(latitud) : null,
+        longitud: longitud ? parseFloat(longitud) : null,
+        nivel_verificacion: nivel_verificacion ? parseInt(nivel_verificacion) : 1,
+        estado: estado || 'activo',
+        direccion: direccion || null
+      })
+      .eq('id', id)
+      .select();
+
+    if (error) return res.status(400).json({ success: false, message: error.message });
+    return res.json({ success: true, message: 'Comercio actualizado con éxito', data: data[0] });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: 'Error actualizando comercio' });
+  }
+});
 // ==========================================
 // 🌐 RUTAS DE VISTAS HTML
 // ==========================================

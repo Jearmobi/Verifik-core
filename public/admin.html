@@ -3,187 +3,277 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Verifik Shield - Panel de Administración</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-950 text-slate-100 min-h-screen p-4 font-sans">
+  <title>Panel Admin - Verifik Shield</title>
+  
+  <!-- CSS Leaflet Mapa -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-  <div class="max-w-5xl mx-auto space-y-6">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #f8fafc;
+      --accent: #38bdf8;
+      --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 20px; }
+
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+    h1 { color: var(--accent); font-size: 24px; }
+
+    .admin-grid { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
+
+    .list-card, .detail-card {
+      background-color: var(--card);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+
+    .merchant-item {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .merchant-item:hover, .merchant-item.active {
+      background-color: #334155;
+      border-color: var(--accent);
+    }
+
+    .merchant-item h4 { color: var(--accent); font-size: 15px; }
+    .merchant-item p { font-size: 12px; color: #94a3b8; }
+
+    .form-group { margin-bottom: 15px; }
+    label { display: block; font-size: 13px; color: #cbd5e1; margin-bottom: 5px; }
+    input, select { width: 100%; padding: 10px; border-radius: 6px; border: 1px solid var(--border); background: #0f172a; color: #fff; }
+
+    #map { height: 300px; border-radius: 8px; margin-top: 10px; border: 1px solid var(--border); }
+
+    .btn-save {
+      background-color: var(--accent);
+      color: #0f172a;
+      font-weight: bold;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 15px;
+      font-size: 15px;
+    }
+
+    .btn-save:hover { background-color: #0284c7; }
     
-    <!-- Header Admin -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900 border border-slate-800 p-5 rounded-2xl">
-      <div>
-        <div class="inline-flex items-center gap-2 bg-blue-950/60 border border-blue-500/30 px-3 py-1 rounded-full mb-1">
-          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span class="text-xs font-bold tracking-wider text-blue-300 uppercase">Panel de Control</span>
-        </div>
-        <h1 class="text-xl font-bold text-white">Auditoría & Gestión Verifik Shield</h1>
-      </div>
-      <button id="refreshBtn" class="bg-blue-600 active:bg-blue-700 text-xs font-bold px-4 py-2 rounded-xl text-white transition">
-        Actualizar Datos
-      </button>
-    </div>
+    .status-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: bold;
+    }
+    .badge-active { background-color: #166534; color: #4ade80; }
+  </style>
+</head>
+<body>
 
-    <!-- Pestañas de Navegación Interna -->
-    <div class="flex border-b border-slate-800 text-xs font-bold gap-4">
-      <button id="tabMerchants" class="pb-2 border-b-2 border-blue-500 text-blue-400">Comercios Registrados</button>
-      <button id="tabReports" class="pb-2 text-slate-400 hover:text-slate-200">Denuncias y Reportes</button>
-    </div>
-
-    <!-- Sección 1: Tabla de Comercios -->
-    <div id="sectionMerchants" class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs border-collapse">
-          <thead class="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase font-mono">
-            <tr>
-              <th class="p-3">Comercio / ID</th>
-              <th class="p-3">RIF & Propietario</th>
-              <th class="p-3">Pago Móvil</th>
-              <th class="p-3">Nivel de Seguridad</th>
-              <th class="p-3 text-right">Acción</th>
-            </tr>
-          </thead>
-          <tbody id="merchantsTableBody" class="divide-y divide-slate-800 text-slate-300">
-            <tr><td colspan="5" class="p-4 text-center text-slate-500">Cargando comercios...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Sección 2: Tabla de Reportes / Denuncias -->
-    <div id="sectionReports" class="hidden bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs border-collapse">
-          <thead class="bg-slate-950 text-slate-400 border-b border-slate-800 uppercase font-mono">
-            <tr>
-              <th class="p-3">ID Comercio</th>
-              <th class="p-3">Motivo del Reporte</th>
-              <th class="p-3">Contacto Denunciante</th>
-              <th class="p-3">Fecha</th>
-            </tr>
-          </thead>
-          <tbody id="reportsTableBody" class="divide-y divide-slate-800 text-slate-300">
-            <tr><td colspan="4" class="p-4 text-center text-slate-500">Cargando reportes...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
+  <div class="header">
+    <h1>🛡️ Admin Panel - Ubicación y Certificación</h1>
+    <span>Maturín, Venezuela</span>
   </div>
 
+  <div class="admin-grid">
+    <!-- Lista de Comercios -->
+    <div class="list-card">
+      <h3>Comercios Registrados</h3>
+      <p style="font-size: 12px; color: #94a3b8; margin-bottom: 15px;">Selecciona un comercio para ajustar su mapa:</p>
+      <div id="merchants-list">Cargando comercios...</div>
+    </div>
+
+    <!-- Detalle y Geolocalización en Mapa -->
+    <div class="detail-card">
+      <h3 id="selected-title">Selecciona un comercio</h3>
+      
+      <form id="geo-form" style="display: none; margin-top: 15px;">
+        <input type="hidden" id="merchant-id" />
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label>Nivel de Verificación</label>
+            <select id="nivel_verificacion">
+              <option value="1">Nivel 1 - Básico (Registro Web)</option>
+              <option value="2">Nivel 2 - Verificado (Ubicación Validada)</option>
+              <option value="3">Nivel 3 - Gold (Comercio Destacado)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Estado del Comercio</label>
+            <select id="estado">
+              <option value="activo">Activo</option>
+              <option value="suspendido">Suspendido</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Dirección Descriptiva</label>
+          <input type="text" id="direccion" placeholder="Ej. Sector Tipuro, C.C. Servimas, Local 4" />
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <div class="form-group">
+            <label>Latitud</label>
+            <input type="text" id="latitud" readonly />
+          </div>
+          <div class="form-group">
+            <label>Longitud</label>
+            <input type="text" id="longitud" readonly />
+          </div>
+        </div>
+
+        <label>📍 Haz clic en el mapa de Maturín o arrastra el pin para ubicar el comercio:</label>
+        <div id="map"></div>
+
+        <button type="submit" class="btn-save">💾 Guardar Ubicación y Verificación</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- JS Leaflet Mapa -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
   <script>
-    const SUPABASE_HOST = 'rwovvnzlaqiqrmngitxo.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJ3b3Z2bnpsYXFpcXJtbmdpdHhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA2MjM1MDMsImV4cCI6MjEwNjE5OTUwM30.XffoL0XBGKnjn3j-TcOKStP0RE-BBNsgaPUgq-B2orU';
+    let map, marker;
+    let selectedMerchant = null;
 
-    const headers = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` };
+    // Coordenadas iniciales por defecto: Maturín, Venezuela
+    const MATURIN_LAT = 9.7457;
+    const MATURIN_LNG = -63.1832;
 
-    // Cargar Comercios
-    async function loadMerchants() {
-      const tbody = document.getElementById('merchantsTableBody');
-      try {
-        const res = await fetch(`https://${SUPABASE_HOST}/rest/v1/merchants?select=*&order=created_at.desc`, { headers });
-        const merchants = await res.json();
-
-        if (!merchants.length) {
-          tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-slate-500">No hay comercios registrados aún.</td></tr>';
-          return;
-        }
-
-        tbody.innerHTML = merchants.map(m => `
-          <tr class="hover:bg-slate-800/40 transition">
-            <td class="p-3">
-              <div class="font-bold text-white">${m.tienda || 'Sin Nombre'}</div>
-              <div class="font-mono text-[10px] text-blue-400">/verify?id=${m.id}</div>
-            </td>
-            <td class="p-3">
-              <div>${m.rif || 'N/A'}</div>
-              <div class="text-[10px] text-slate-400">${m.propietario || 'S/D'}</div>
-            </td>
-            <td class="p-3 font-mono text-[11px]">
-              ${m.banco_pago_movil ? `${m.banco_pago_movil} -${m.cedula_pago_movil}` : '<span class="text-slate-500">No registrado</span>'}
-            </td>
-            <td class="p-3">
-              <select onchange="updateLevel('${m.id}', this.value)" class="bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-white">
-                <option value="1" ${m.nivel_verificacion == 1 ? 'selected' : ''}>1★ Básica</option>
-                <option value="2" ${m.nivel_verificacion == 2 ? 'selected' : ''}>2★ Comercial</option>
-                <option value="3" ${m.nivel_verificacion == 3 ? 'selected' : ''}>3★ Certificada</option>
-              </select>
-            </td>
-            <td class="p-3 text-right">
-              <a href="/verify?id=${m.id}" target="_blank" class="text-blue-400 hover:underline text-[11px]">Ver Certificado</a>
-            </td>
-          </tr>
-        `).join('');
-      } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-rose-400">Error al cargar datos.</td></tr>';
-      }
-    }
-
-    // Actualizar Nivel de Verificación en Supabase
-    async function updateLevel(id, newLevel) {
-      try {
-        const res = await fetch(`https://${SUPABASE_HOST}/rest/v1/merchants?id=eq.${encodeURIComponent(id)}`, {
-          method: 'PATCH',
-          headers: { ...headers, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
-          body: JSON.stringify({ nivel_verificacion: parseInt(newLevel) })
-        });
-        if (res.ok) alert(`Nivel de verificación actualizado a ${newLevel}★ para ${id}`);
-        else alert("Error al actualizar nivel.");
-      } catch (e) { alert("Error de conexión."); }
-    }
-
-    // Cargar Denuncias
-    async function loadReports() {
-      const tbody = document.getElementById('reportsTableBody');
-      try {
-        const res = await fetch(`https://${SUPABASE_HOST}/rest/v1/reports?select=*&order=fecha.desc`, { headers });
-        const reports = await res.json();
-
-        if (!reports.length) {
-          tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-500">Sin denuncias o reportes registrados.</td></tr>';
-          return;
-        }
-
-        tbody.innerHTML = reports.map(r => `
-          <tr class="hover:bg-slate-800/40 transition">
-            <td class="p-3 font-mono text-rose-400 font-bold">${r.merchant_id}</td>
-            <td class="p-3 text-slate-200">${r.motivo}</td>
-            <td class="p-3 font-mono">${r.contacto_denunciante || 'Anónimo'}</td>
-            <td class="p-3 text-slate-400 text-[10px]">${new Date(r.fecha).toLocaleString()}</td>
-          </tr>
-        `).join('');
-      } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-rose-400">Error al cargar reportes.</td></tr>';
-      }
-    }
-
-    // Gestión de Pestañas
-    const tabMerchants = document.getElementById('tabMerchants');
-    const tabReports = document.getElementById('tabReports');
-    const secMerchants = document.getElementById('sectionMerchants');
-    const secReports = document.getElementById('sectionReports');
-
-    tabMerchants.addEventListener('click', () => {
-      tabMerchants.className = "pb-2 border-b-2 border-blue-500 text-blue-400";
-      tabReports.className = "pb-2 text-slate-400 hover:text-slate-200";
-      secMerchants.classList.remove('hidden');
-      secReports.classList.add('hidden');
-    });
-
-    tabReports.addEventListener('click', () => {
-      tabReports.className = "pb-2 border-b-2 border-blue-500 text-blue-400";
-      tabMerchants.className = "pb-2 text-slate-400 hover:text-slate-200";
-      secReports.classList.remove('hidden');
-      secMerchants.classList.add('hidden');
-      loadReports();
-    });
-
-    document.getElementById('refreshBtn').addEventListener('click', () => {
+    document.addEventListener('DOMContentLoaded', () => {
+      initMap();
       loadMerchants();
-      loadReports();
     });
 
-    window.addEventListener('DOMContentLoaded', loadMerchants);
+    function initMap() {
+      map = L.map('map').setView([MATURIN_LAT, MATURIN_LNG], 13);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+      }).addTo(map);
+
+      // Crear pin arrastrable
+      marker = L.marker([MATURIN_LAT, MATURIN_LNG], { draggable: true }).addTo(map);
+
+      // Evento al arrastrar el pin
+      marker.on('dragend', function (e) {
+        const position = marker.getLatLng();
+        document.getElementById('latitud').value = position.lat.toFixed(6);
+        document.getElementById('longitud').value = position.lng.toFixed(6);
+      });
+
+      // Evento al hacer clic directo en el mapa
+      map.on('click', function (e) {
+        marker.setLatLng(e.latlng);
+        document.getElementById('latitud').value = e.latlng.lat.toFixed(6);
+        document.getElementById('longitud').value = e.latlng.lng.toFixed(6);
+      });
+    }
+
+    async function loadMerchants() {
+      try {
+        const res = await fetch('/api/merchants');
+        const result = await res.json();
+
+        if (result.success) {
+          renderList(result.data);
+        }
+      } catch (err) {
+        console.error('Error cargando comercios:', err);
+      }
+    }
+
+    function renderList(merchants) {
+      const container = document.getElementById('merchants-list');
+      container.innerHTML = '';
+
+      merchants.forEach(m => {
+        const div = document.createElement('div');
+        div.className = 'merchant-item';
+        div.innerHTML = `
+          <h4>${m.tienda || 'Sin Nombre'} <span class="status-badge badge-active">${m.estado || 'activo'}</span></h4>
+          <p>RIF: ${m.rif || 'N/A'} | Tel: ${m.telefono || 'N/A'}</p>
+          <p>📍 ${m.latitud ? 'Ubicación asignada' : '⚠️ Sin coordenadas'}</p>
+        `;
+        div.onclick = () => selectMerchant(m, div);
+        container.appendChild(div);
+      });
+    }
+
+    function selectMerchant(m, element) {
+      document.querySelectorAll('.merchant-item').forEach(el => el.classList.remove('active'));
+      element.classList.add('active');
+
+      selectedMerchant = m;
+      document.getElementById('selected-title').textContent = `Geolocalizar: ${m.tienda}`;
+      document.getElementById('geo-form').style.display = 'block';
+
+      document.getElementById('merchant-id').value = m.id;
+      document.getElementById('nivel_verificacion').value = m.nivel_verificacion || 1;
+      document.getElementById('estado').value = m.estado || 'activo';
+      document.getElementById('direccion').value = m.direccion || '';
+
+      const lat = m.latitud ? parseFloat(m.latitud) : MATURIN_LAT;
+      const lng = m.longitud ? parseFloat(m.longitud) : MATURIN_LNG;
+
+      document.getElementById('latitud').value = lat;
+      document.getElementById('longitud').value = lng;
+
+      // Centrar mapa y mover pin
+      const newLatLng = new L.LatLng(lat, lng);
+      map.setView(newLatLng, 15);
+      marker.setLatLng(newLatLng);
+
+      setTimeout(() => map.invalidateSize(), 300); // Forzar renderizado de mapa
+    }
+
+    // Guardar cambios
+    document.getElementById('geo-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('merchant-id').value;
+
+      const payload = {
+        latitud: document.getElementById('latitud').value,
+        longitud: document.getElementById('longitud').value,
+        nivel_verificacion: document.getElementById('nivel_verificacion').value,
+        estado: document.getElementById('estado').value,
+        direccion: document.getElementById('direccion').value
+      };
+
+      try {
+        const res = await fetch(`/api/merchants/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          alert('✅ Ubicación y datos actualizados con éxito en Supabase');
+          loadMerchants();
+        } else {
+          alert('❌ Error: ' + data.message);
+        }
+      } catch (err) {
+        alert('❌ Error al guardar datos');
+      }
+    });
   </script>
 </body>
 </html>
